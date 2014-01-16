@@ -25,6 +25,8 @@
 
 namespace libwallet {
 
+typedef data_chunk private_data;
+
 std::string secret_to_wif(const secret_parameter& secret)
 {
     private_data unencoded_data(secret.begin(), secret.end());
