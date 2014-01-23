@@ -1,5 +1,5 @@
 CXXFLAGS=$(shell pkg-config --cflags libbitcoin) -ggdb
-LIBS=$(shell pkg-config --libs libbitcoin)
+LIBS=$(shell pkg-config --libs libbitcoin libwallet)
 
 default: all
 

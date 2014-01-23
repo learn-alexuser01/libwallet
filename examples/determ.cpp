@@ -21,7 +21,10 @@
   Demonstration of deterministic wallet.
 */
 #include <bitcoin/bitcoin.hpp>
+#include <wallet/wallet.hpp>
+
 using namespace bc;
+using namespace libwallet; 
 
 int main()
 {
