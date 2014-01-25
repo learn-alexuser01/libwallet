@@ -121,7 +121,8 @@ secret_parameter stretch_seed(const std::string& seed)
 data_chunk pubkey_from_secret(const secret_parameter& secret)
 {
     elliptic_curve_key privkey;
-    if (!privkey.set_secret(secret))
+    // Disable compression for this key (legacy electrum.)
+    if (!privkey.set_secret(secret, false))
         return data_chunk();
     return privkey.public_key();
 }

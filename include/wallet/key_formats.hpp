@@ -29,15 +29,16 @@ using namespace libbitcoin;
 
 /**
  * Convert a secret parameter to the wallet import format.
+ * The compressed flag can be used to show this represents a compressed pubkey.
  * Returns an empty string on error.
  *
  * @code
- *  std::string wif = secret_to_wif(secret);
+ *  std::string wif = secret_to_wif(secret, compressed=true);
  *  if (wif.empty())
  *      // Error...
  * @endcode
  */
-std::string secret_to_wif(const secret_parameter& secret);
+std::string secret_to_wif(const secret_parameter& secret, bool compressed=true);
 
 /**
  * Convert wallet import format key to secret parameter.

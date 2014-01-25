@@ -27,10 +27,13 @@ namespace libwallet {
 
 typedef data_chunk private_data;
 
-std::string secret_to_wif(const secret_parameter& secret)
+std::string secret_to_wif(const secret_parameter& secret, bool compressed)
 {
     private_data unencoded_data(secret.begin(), secret.end());
     unencoded_data.insert(unencoded_data.begin(), payment_address::wif_version);
+    if (compressed)
+        extend_data(unencoded_data, uncast_type(0x01));
+
     uint32_t checksum = generate_sha256_checksum(unencoded_data);
     extend_data(unencoded_data, uncast_type(checksum));
     return encode_base58(unencoded_data);
@@ -39,8 +42,9 @@ std::string secret_to_wif(const secret_parameter& secret)
 secret_parameter wif_to_secret(const std::string& wif)
 {
     private_data decoded = decode_base58(wif);
-    // 1 marker, 32 byte secret, 4 checksum bytes
-    if (decoded.size() != 1 + sha256_digest_size + 4)
+    // 1 marker, 32 byte secret, optional 1 compressed flag, 4 checksum bytes
+    if (decoded.size() != 1 + sha256_digest_size + 4 || 
+        decoded.size() != 1 + sha256_digest_size + 1 + 4)
         return secret_parameter();
     // Check first byte is valid and remove it
     if (decoded[0] != payment_address::wif_version)
@@ -54,6 +58,9 @@ secret_parameter wif_to_secret(const std::string& wif)
         return secret_parameter();
     // Checks passed. Drop the 0x80 start byte.
     decoded.erase(decoded.begin());
+    // If length is still 33 and last byte is 0x01, drop it.
+    if (decoded.size() == 33 && decoded[32] == 0x01)
+        decoded.erase(decoded.end());
     secret_parameter secret;
     BITCOIN_ASSERT(secret.size() == decoded.size());
     std::copy(decoded.begin(), decoded.end(), secret.begin());
