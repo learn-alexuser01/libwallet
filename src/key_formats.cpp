@@ -32,7 +32,7 @@ std::string secret_to_wif(const secret_parameter& secret, bool compressed)
     private_data unencoded_data(secret.begin(), secret.end());
     unencoded_data.insert(unencoded_data.begin(), payment_address::wif_version);
     if (compressed)
-        extend_data(unencoded_data, uncast_type(0x01));
+        extend_data(unencoded_data, uncast_type<uint8_t>(0x01));
 
     uint32_t checksum = generate_sha256_checksum(unencoded_data);
     extend_data(unencoded_data, uncast_type(checksum));
