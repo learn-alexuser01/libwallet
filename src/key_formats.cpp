@@ -43,7 +43,7 @@ secret_parameter wif_to_secret(const std::string& wif)
 {
     private_data decoded = decode_base58(wif);
     // 1 marker, 32 byte secret, optional 1 compressed flag, 4 checksum bytes
-    if (decoded.size() != 1 + sha256_digest_size + 4 || 
+    if (decoded.size() != 1 + sha256_digest_size + 4 && 
         decoded.size() != 1 + sha256_digest_size + 1 + 4)
         return secret_parameter();
     // Check first byte is valid and remove it
@@ -59,8 +59,8 @@ secret_parameter wif_to_secret(const std::string& wif)
     // Checks passed. Drop the 0x80 start byte.
     decoded.erase(decoded.begin());
     // If length is still 33 and last byte is 0x01, drop it.
-    if (decoded.size() == 33 && decoded[32] == 0x01)
-        decoded.erase(decoded.end());
+    if (decoded.size() == 33 && decoded[32] == (uint8_t)0x01)
+        decoded.erase(decoded.begin()+32);
     secret_parameter secret;
     BITCOIN_ASSERT(secret.size() == decoded.size());
     std::copy(decoded.begin(), decoded.end(), secret.begin());
