@@ -67,6 +67,15 @@ secret_parameter wif_to_secret(const std::string& wif)
     return secret;
 }
 
+bool is_wif_compressed(const std::string& wif) {
+    data_chunk decoded = decode_base58(wif);
+    if (decoded.size() == 1 + sha256_digest_size + 1 + 4 &&
+        decoded[33] == (uint8_t)0x01)
+        return true;
+    else
+        return false;
+}
+
 hash_digest single_sha256(const std::string& mini)
 {
     SHA256_CTX ctx;

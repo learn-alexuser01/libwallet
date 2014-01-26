@@ -54,6 +54,20 @@ std::string secret_to_wif(const secret_parameter& secret, bool compressed=true);
 secret_parameter wif_to_secret(const std::string& wif);
 
 /**
+ * Checks to see if a wif refers to a compressed public key.
+ * This does no other checks on the validity of the wif.
+ * Returns false otherwise.
+ *
+ * @code
+ *  bool compressed = is_wif_compressed(      
+ *		"5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ");
+ *  if (compressed == false)
+ *      // Wif is not compressed
+ * @endcode
+ */
+bool is_wif_compressed(const std::string& wif);
+
+/**
  * Convert Cascasius minikey to secret parameter.
  * Returns a nulled secret on error.
  *
