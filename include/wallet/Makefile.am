@@ -3,5 +3,6 @@ wallet_include_HEADERS = \
     wallet.hpp \
     key_formats.hpp \
     transaction.hpp \
-    deterministic_wallet.hpp
+    deterministic_wallet.hpp \
+    mnemonic.hpp
 
