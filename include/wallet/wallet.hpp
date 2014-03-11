@@ -25,6 +25,7 @@
 #include <wallet/mnemonic.hpp>
 #include <wallet/key_formats.hpp>
 #include <wallet/transaction.hpp>
+#include <wallet/uri.hpp>
 
 #endif
 

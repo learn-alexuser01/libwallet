@@ -3,14 +3,17 @@ LIBS=$(shell pkg-config --libs libbitcoin libwallet)
 
 default: all
 
-determ.o: determ.cpp
+.cpp.o:
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
 determ: determ.o
 	$(CXX) -o $@ $< $(LIBS)
 
-all: determ
+uri: uri.o
+	$(CXX) -o $@ $< $(LIBS)
+
+all: determ uri
 
 clean:
-	rm -f determ
+	rm -f determ uri
 	rm -f *.o
