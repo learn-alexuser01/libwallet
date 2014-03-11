@@ -13,4 +13,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="readme.txt">
+      <Filter>src</Filter>
+    </Text>
+  </ItemGroup>
 </Project>
