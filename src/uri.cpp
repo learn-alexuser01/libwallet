@@ -43,6 +43,10 @@ static bool is_qchar(char c)
         ':' == c || '@' == c || // pchar
         '/' == c || '?' == c;   // query
 }
+static bool is_qchar_or_space(char c)
+{
+    return is_qchar(c) || ' ' == c;
+}
 
 static unsigned from_hex(char c)
 {
@@ -109,7 +113,7 @@ bool uri_parse(const std::string& uri, uri_parse_handler& handler)
             ++i; // Consume '='
             if (key.empty())
                 return false;
-            value = unescape(i, uri.end(), is_qchar);
+            value = unescape(i, uri.end(), is_qchar_or_space);
         }
         if (uri.end() != i && '&' != *i)
             return false;

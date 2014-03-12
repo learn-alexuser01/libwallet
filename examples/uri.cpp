@@ -84,6 +84,7 @@ int main()
     test_uri_parse("bitcoin:19z88?name=%3G");
     test_uri_parse("bitcoin:19z88?name=%3f");
     test_uri_parse("bitcoin:%31");
+    test_uri_parse("bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?label=Some joker");
 
     std::cout << "================================" << std::endl;
 
@@ -99,6 +100,7 @@ int main()
     test_uri_decode("bitcoin:?r=http://www.example.com?purchase%3Dshoes");
     test_uri_decode("bitcoin:?foo=ignore");
     test_uri_decode("bitcoin:?req-foo=die");
+    test_uri_decode("bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?label=Some joker");
 
     return 0;
 }
