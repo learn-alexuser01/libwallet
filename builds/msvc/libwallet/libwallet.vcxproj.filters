@@ -10,6 +10,9 @@
     <ClCompile Include="..\..\..\src\transaction.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\mnemonic.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\wallet\deterministic_wallet.hpp">
@@ -22,6 +25,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\wallet\wallet.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\wallet\mnemonic.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>

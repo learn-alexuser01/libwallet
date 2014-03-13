@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_USRDLL;NDEBUG;_WINDOWS;WIN32;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_USRDLL;NDEBUG;_WINDOWS;WIN32;_WIN32_WINNT=0x0600;BITCOIN_DISABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -90,12 +90,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\wallet\deterministic_wallet.hpp" />
     <ClInclude Include="..\..\..\include\wallet\key_formats.hpp" />
+    <ClInclude Include="..\..\..\include\wallet\mnemonic.hpp" />
     <ClInclude Include="..\..\..\include\wallet\transaction.hpp" />
     <ClInclude Include="..\..\..\include\wallet\wallet.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\deterministic_wallet.cpp" />
     <ClCompile Include="..\..\..\src\key_formats.cpp" />
+    <ClCompile Include="..\..\..\src\mnemonic.cpp" />
     <ClCompile Include="..\..\..\src\transaction.cpp" />
   </ItemGroup>
   <ItemGroup>

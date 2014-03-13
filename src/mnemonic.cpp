@@ -19,6 +19,9 @@
  */
 #include <wallet/mnemonic.hpp>
 
+#ifdef _WINDOWS
+#include <stdint.h>
+#endif
 #include <algorithm>
 #include <sstream>
 #include <bitcoin/utility/assert.hpp>
