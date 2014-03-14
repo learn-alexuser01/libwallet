@@ -32,14 +32,14 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)../../../bin/$(PlatformName)/$(Configuration)/</OutDir>
-    <IntDir>$(ProjectDir)../../../obj/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\bin\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(ProjectDir)../../../bin/$(PlatformName)/$(Configuration)/</OutDir>
-    <IntDir>$(ProjectDir)../../../obj/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\bin\$(PlatformName)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\obj\$(PlatformName)\$(Configuration)\$(ProjectName)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -58,13 +58,13 @@
       <MinimalRebuild>false</MinimalRebuild>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_USRDLL;_DEBUG;_WINDOWS;WIN32;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_WINDOWS;_WIN32;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);../../../../libbitcoin/bin/$(PlatformName)/$(ConfigurationName)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\..\libbitcoin\bin\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -75,7 +75,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
-      <PreprocessorDefinitions>_USRDLL;NDEBUG;_WINDOWS;WIN32;_WIN32_WINNT=0x0600;BITCOIN_DISABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;_WIN32;_WIN32_WINNT=0x0600;BITCOIN_DISABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -83,7 +83,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);../../../../libbitcoin/bin/$(PlatformName)/$(ConfigurationName)/</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\..\libbitcoin\bin\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

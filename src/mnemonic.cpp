@@ -21,6 +21,7 @@
 
 #ifdef _WINDOWS
 #include <stdint.h>
+#include <iostream>
 #endif
 #include <algorithm>
 #include <sstream>
