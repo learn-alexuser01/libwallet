@@ -6,6 +6,7 @@ libwallet_la_SOURCES = \
     deterministic_wallet.cpp \
     mnemonic.cpp \
     transaction.cpp \
+    hd_keys.cpp \
     key_formats.cpp \
     uri.cpp
 

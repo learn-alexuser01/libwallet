@@ -9,11 +9,14 @@ default: all
 determ: determ.o
 	$(CXX) -o $@ $< $(LIBS)
 
+hd: hd.o
+	$(CXX) -o $@ $< $(LIBS)
+
 uri: uri.o
 	$(CXX) -o $@ $< $(LIBS)
 
-all: determ uri
+all: determ hd uri
 
 clean:
-	rm -f determ uri
+	rm -f determ hd uri
 	rm -f *.o
