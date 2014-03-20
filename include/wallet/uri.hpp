@@ -57,11 +57,12 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict=true);
 constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
 
 /**
- * Parses a bitcoin amount.
- * @param amount string, in bitcoins.
- * @return string value, in satoshis, or -1 for failure.
+ * Validates and parses an amount string according to the BIP 21 grammar.
+ * @param decmial_place the location of the decimal point. The default
+ * value converts bitcoins to satoshis.
+ * @return parsed value, or invalid_amount for failure.
  */
-uint64_t parse_amount(const std::string& amount);
+uint64_t parse_amount(const std::string& amount, unsigned decimal_place=8);
 
 } // libwallet
 

@@ -211,10 +211,16 @@ int main()
     BITCOIN_ASSERT(libwallet::parse_amount("4.432") == 443200000);
     BITCOIN_ASSERT(
         libwallet::parse_amount("4.432.") == libwallet::invalid_amount);
-    BITCOIN_ASSERT(libwallet::parse_amount("45.432") == 4543200000);
+    BITCOIN_ASSERT(libwallet::parse_amount("4")  == 400000000);
+    BITCOIN_ASSERT(libwallet::parse_amount("4.") == 400000000);
+    BITCOIN_ASSERT(libwallet::parse_amount(".4") == 40000000);
+    BITCOIN_ASSERT(libwallet::parse_amount(".")  == 0);
+    BITCOIN_ASSERT(libwallet::parse_amount("0.00000004")  == 4);
+    BITCOIN_ASSERT(libwallet::parse_amount("0.000000049") == 4);
     BITCOIN_ASSERT(libwallet::parse_amount("4.432112345") == 443211234);
-    BITCOIN_ASSERT(libwallet::parse_amount("4") == 400000000);
-    BITCOIN_ASSERT(libwallet::parse_amount(".") == 0);
+    BITCOIN_ASSERT(libwallet::parse_amount("21000000") == 2100000000000000);
+    BITCOIN_ASSERT(libwallet::parse_amount("1234.9", 0) == 1234);
+    BITCOIN_ASSERT(libwallet::parse_amount("64.25", 5) == 6425000);
 
     return 0;
 }
