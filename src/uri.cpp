@@ -20,9 +20,9 @@
 #include <wallet/uri.hpp>
 
 #include <algorithm>
-#include <cstdlib>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <bitcoin/constants.hpp>
 #include <bitcoin/utility/base58.hpp>
 
 namespace libwallet {
@@ -90,7 +90,7 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(char))
  * false allows these malformed URI's to parse anyhow.
  * @return false if the URI is malformed.
  */
-bool uri_parse(const std::string& uri, uri_parse_handler& handler, bool strict)
+bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
 {
     auto i = uri.begin();
 
@@ -108,8 +108,8 @@ bool uri_parse(const std::string& uri, uri_parse_handler& handler, bool strict)
     std::string address = unescape(i, uri.end(), libbitcoin::is_base58);
     if (uri.end() != i && '?' != *i)
         return false;
-    if (!address.empty())
-        handler.got_address(address);
+    if (!address.empty() && !result.got_address(address))
+        return false;
 
     // Parameters:
     while (uri.end() != i)
@@ -126,98 +126,39 @@ bool uri_parse(const std::string& uri, uri_parse_handler& handler, bool strict)
         }
         if (uri.end() != i && '&' != *i)
             return false;
-        if (!key.empty())
-            handler.got_param(key, value);
+        if (!key.empty() && !result.got_param(key, value))
+            return false;
     }
     return true;
 }
 
-/**
- * Validates a bitcoin URI according to the BIP 21 grammar.
- * This function only checks the general shape, and does not validate
- * individual parameters.
- */
-bool uri_validate(const std::string& uri, bool strict)
+bool uri_parse_result::got_address(std::string& address)
 {
-    class parse_handler: public uri_parse_handler
-    {
-        virtual void got_address(std::string& address)
-        {
-            (void)address;
-        }
-        virtual void got_param(std::string& key, std::string& value)
-        {
-            (void)key;
-            (void)value;
-        }
-    } handler;
-    return uri_parse(uri, handler, strict);
+    libbitcoin::payment_address payaddr;
+    if (!payaddr.set_encoded(address))
+        return false;
+    this->address.reset(payaddr);
+    return true;
 }
 
-decoded_uri uri_decode(const std::string& uri, bool strict)
+bool uri_parse_result::got_param(std::string& key, std::string& value)
 {
-    class parse_handler: public uri_parse_handler
+    if (key == "amount")
     {
-    public:
-        decoded_uri wip_;
-        virtual void got_address(std::string& address)
-        {
-            if (wip_.address.set_encoded(address))
-                wip_.has_address = true;
-            else
-                wip_.valid = false;
-        }
-        virtual void got_param(std::string& key, std::string& value)
-        {
-            if ("amount" == key)
-            {
-                wip_.amount = parse_amount(value);
-                if (static_cast<uint64_t>(-1) != wip_.amount)
-                    wip_.has_amount = true;
-                else
-                    wip_.valid = false;
-            }
-            else if ("label" == key)
-            {
-                wip_.label = std::move(value);
-                wip_.has_label = true;
-            }
-            else if ("message" == key)
-            {
-                wip_.message = std::move(value);
-                wip_.has_message = true;
-            }
-            else if ("r" == key)
-            {
-                wip_.r = std::move(value);
-                wip_.has_r = true;
-            }
-            else if (!key.compare(0, 4, "req-"))
-            {
-                wip_.valid = false;
-            }
-        }
-    } handler;
-    if (!uri_parse(uri, handler, strict))
-        handler.wip_.valid = false;
-    return handler.wip_;
-}
-
-/**
- * Validates an amount string according to the BIP 21 grammar.
- */
-static bool check_amount(const std::string& amount)
-{
-    auto i = amount.begin();
-    while (amount.end() != i && is_digit(*i))
-        ++i;
-    if (amount.end() != i && '.' == *i)
-    {
-        ++i;
-        while (amount.end() != i && is_digit(*i))
-            ++i;
+        uint64_t amount = parse_amount(value);
+        if (std::numeric_limits<uint64_t>::max() == amount)
+            return false;
+        this->amount.reset(amount);
     }
-    return amount.end() == i;
+    else if (key == "label")
+        label.reset(value);
+    else if (key == "message")
+        message.reset(value);
+    else if (key == "r")
+        r.reset(value);
+    else if (!key.compare(0, 4, "req-"))
+        return false;
+    return true;
 }
 
 uint64_t parse_amount(const std::string& amount)
