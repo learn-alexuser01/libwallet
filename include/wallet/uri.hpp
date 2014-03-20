@@ -30,8 +30,9 @@ struct uri_parse_handler {
     virtual void got_param(std::string& key, std::string& value) = 0;
 };
 
-bool uri_parse(const std::string& uri, uri_parse_handler& handler);
-bool uri_validate(const std::string& uri);
+bool uri_parse(const std::string& uri, uri_parse_handler& handler,
+    bool strict=true);
+bool uri_validate(const std::string& uri, bool strict=true);
 
 /**
  * A decoded bitcoin URI corresponding to BIP 21 and BIP 72.
@@ -58,7 +59,7 @@ struct decoded_uri
     {}
 };
 
-decoded_uri uri_decode(const std::string& uri);
+decoded_uri uri_decode(const std::string& uri, bool strict=true);
 
 /**
  * Parses a bitcoin amount string.

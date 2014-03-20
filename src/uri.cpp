@@ -43,9 +43,9 @@ static bool is_qchar(char c)
         ':' == c || '@' == c || // pchar
         '/' == c || '?' == c;   // query
 }
-static bool is_qchar_or_space(char c)
+static bool isnt_amp(char c)
 {
-    return is_qchar(c) || ' ' == c;
+    return '&' != c;
 }
 
 static unsigned from_hex(char c)
@@ -81,7 +81,14 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(char))
     return out;
 }
 
-bool uri_parse(const std::string& uri, uri_parse_handler& handler)
+/**
+ * Parses a URI string into its individual components.
+ * @param strict Only accept properly-escaped parameters. Some bitcoin
+ * software does not properly escape URI parameters, and setting strict to
+ * false allows these malformed URI's to parse anyhow.
+ * @return false if the URI is malformed.
+ */
+bool uri_parse(const std::string& uri, uri_parse_handler& handler, bool strict)
 {
     auto i = uri.begin();
 
@@ -113,7 +120,7 @@ bool uri_parse(const std::string& uri, uri_parse_handler& handler)
             ++i; // Consume '='
             if (key.empty())
                 return false;
-            value = unescape(i, uri.end(), is_qchar_or_space);
+            value = unescape(i, uri.end(), strict ? is_qchar : isnt_amp);
         }
         if (uri.end() != i && '&' != *i)
             return false;
@@ -123,7 +130,12 @@ bool uri_parse(const std::string& uri, uri_parse_handler& handler)
     return true;
 }
 
-bool uri_validate(const std::string& uri)
+/**
+ * Validates a bitcoin URI according to the BIP 21 grammar.
+ * This function only checks the general shape, and does not validate
+ * individual parameters.
+ */
+bool uri_validate(const std::string& uri, bool strict)
 {
     class parse_handler: public uri_parse_handler
     {
@@ -137,10 +149,10 @@ bool uri_validate(const std::string& uri)
             (void)value;
         }
     } handler;
-    return uri_parse(uri, handler);
+    return uri_parse(uri, handler, strict);
 }
 
-decoded_uri uri_decode(const std::string& uri)
+decoded_uri uri_decode(const std::string& uri, bool strict)
 {
     class parse_handler: public uri_parse_handler
     {
@@ -184,7 +196,7 @@ decoded_uri uri_decode(const std::string& uri)
             }
         }
     } handler;
-    if (!uri_parse(uri, handler))
+    if (!uri_parse(uri, handler, strict))
         handler.wip_.valid = false;
     return handler.wip_;
 }

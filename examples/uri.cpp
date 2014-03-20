@@ -24,7 +24,7 @@
 #include <wallet/wallet.hpp>
 #include <iostream>
 
-void test_uri_parse(std::string uri)
+void test_uri_parse(std::string uri, bool strict=true)
 {
     std::cout << "parse URI: \"" << uri << "\"" << std::endl;
     class parse_handler: public libwallet::uri_parse_handler
@@ -39,15 +39,15 @@ void test_uri_parse(std::string uri)
                 value << "\"" << std::endl;
         }
     } handler;
-    if (libwallet::uri_parse(uri, handler))
+    if (libwallet::uri_parse(uri, handler, strict))
         std::cout << "    ok" << std::endl;
     else
         std::cout << "    error" << std::endl;
 }
 
-void test_uri_decode(std::string uri)
+void test_uri_decode(std::string uri, bool strict=true)
 {
-    libwallet::decoded_uri out = libwallet::uri_decode(uri);
+    libwallet::decoded_uri out = libwallet::uri_decode(uri, strict);
     std::cout << "decode URI: \"" << uri << "\"" << std::endl;
     if (!out.valid)
         std::cout << "    invalid" << std::endl;
@@ -84,7 +84,8 @@ int main()
     test_uri_parse("bitcoin:19z88?name=%3G");
     test_uri_parse("bitcoin:19z88?name=%3f");
     test_uri_parse("bitcoin:%31");
-    test_uri_parse("bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?label=Some joker");
+    test_uri_parse("bitcoin:?label=Some テスト");
+    test_uri_parse("bitcoin:?label=Some テスト", false);
 
     std::cout << "================================" << std::endl;
 
@@ -100,7 +101,8 @@ int main()
     test_uri_decode("bitcoin:?r=http://www.example.com?purchase%3Dshoes");
     test_uri_decode("bitcoin:?foo=ignore");
     test_uri_decode("bitcoin:?req-foo=die");
-    test_uri_decode("bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?label=Some joker");
+    test_uri_decode("bitcoin:?label=テスト");
+    test_uri_decode("bitcoin:?label=テスト", false);
 
     return 0;
 }
