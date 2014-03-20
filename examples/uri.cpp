@@ -32,6 +32,22 @@ void reset(libwallet::uri_parse_result& result)
     result.r.reset();
 }
 
+/**
+ * Example class to demonstrate handling custom URI parameters.
+ */
+struct custom_result: public libwallet::uri_parse_result
+{
+    optional_string myparam;
+
+protected:
+    virtual bool got_param(std::string& key, std::string& value)
+    {
+        if ("myparam" == key)
+            myparam.reset(value);
+        return uri_parse_result::got_param(key, value);
+    }
+};
+
 int main()
 {
     libwallet::uri_parse_result result;
@@ -179,6 +195,17 @@ int main()
     reset(result);
     success = libwallet::uri_parse("bitcoin:?req-ignore=false", result);
     BITCOIN_ASSERT(!success);
+
+    // Custom parameter type:
+    custom_result custom;
+    success = libwallet::uri_parse("bitcoin:?myparam=here", custom);
+    BITCOIN_ASSERT(success);
+    BITCOIN_ASSERT(!custom.address);
+    BITCOIN_ASSERT(!custom.amount);
+    BITCOIN_ASSERT(!custom.label);
+    BITCOIN_ASSERT(!custom.message);
+    BITCOIN_ASSERT(!custom.r);
+    BITCOIN_ASSERT(custom.myparam && custom.myparam.get() == "here");
 
     // Number parser:
     BITCOIN_ASSERT(libwallet::parse_amount("4.432") == 443200000);
