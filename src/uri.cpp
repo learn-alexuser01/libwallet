@@ -175,6 +175,8 @@ uint64_t parse_amount(const std::string& amount, unsigned decmial_place)
         {
             if (places < decmial_place)
                 value = 10*value + (*i - '0');
+            else if (places == decmial_place && '5' <= *i)
+                value += 1;
             ++places;
             ++i;
         }
