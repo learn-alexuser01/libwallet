@@ -21,6 +21,7 @@
 #ifndef LIBWALLET_URI_HPP
 #define LIBWALLET_URI_HPP
 
+#include <sstream>
 #include <boost/optional.hpp>
 #include <bitcoin/address.hpp>
 
@@ -63,6 +64,32 @@ constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
  * @return parsed value, or invalid_amount for failure.
  */
 uint64_t parse_amount(const std::string& amount, unsigned decimal_place=8);
+
+/**
+ * Assembles a bitcoin URI string.
+ */
+class uri_writer
+{
+public:
+    uri_writer();
+
+    // Formatted:
+    void write_address(const libbitcoin::payment_address& address);
+    void write_amount(uint64_t satoshis);
+    void write_label(const std::string& label);
+    void write_message(const std::string& message);
+    void write_r(const std::string& r);
+
+    // Raw:
+    void write_address(const std::string& address);
+    void write_param(const std::string& key, const std::string& value);
+
+    std::string string() const;
+
+private:
+    std::ostringstream stream_;
+    bool first_param_;
+};
 
 } // libwallet
 

@@ -19,6 +19,8 @@
  */
 #include <wallet/uri.hpp>
 
+#include <boost/algorithm/string.hpp>
+#include <bitcoin/constants.hpp>
 #include <bitcoin/utility/base58.hpp>
 
 namespace libwallet {
@@ -187,6 +189,81 @@ uint64_t parse_amount(const std::string& amount, unsigned decmial_place)
         ++places;
     }
     return amount.end() == i ? value : invalid_amount;
+}
+
+/**
+ * Percent-encodes a string.
+ * @param is_valid a function returning true for acceptable characters.
+ */
+static std::string escape(const std::string& in, bool (*is_valid)(char))
+{
+    std::ostringstream stream;
+    stream << std::hex << std::uppercase << std::setfill('0');
+    for (auto c: in)
+    {
+        if (is_valid(c))
+            stream << c;
+        else
+            stream << '%' << std::setw(2) << +c;
+    }
+    return stream.str();
+}
+
+uri_writer::uri_writer()
+  : first_param_{true}
+{
+    stream_ << "bitcoin:";
+}
+
+void uri_writer::write_address(const libbitcoin::payment_address& address)
+{
+    write_address(address.encoded());
+}
+
+void uri_writer::write_amount(uint64_t satoshis)
+{
+    // Format as a fixed-point number:
+    uint64_t bitcoin = satoshis / libbitcoin::coin_price();
+    satoshis = satoshis % libbitcoin::coin_price();
+    std::ostringstream stream;
+    stream << bitcoin << '.' << std::setw(8) << std::setfill('0') << satoshis;
+    // Trim trailing zeros:
+    auto string = stream.str();
+    boost::algorithm::trim_right_if(string, [](char c){ return '0' == c; });
+    boost::algorithm::trim_right_if(string, [](char c){ return '.' == c; });
+    write_param("amount", string);
+}
+
+void uri_writer::write_label(const std::string& label)
+{
+    write_param("label", label);
+}
+
+void uri_writer::write_message(const std::string& message)
+{
+    write_param("message", message);
+}
+
+void uri_writer::write_r(const std::string& r)
+{
+    write_param("r", r);
+}
+
+void uri_writer::write_address(const std::string& address)
+{
+    stream_ << address;
+}
+
+void uri_writer::write_param(const std::string& key, const std::string& value)
+{
+    stream_ << (first_param_ ? '?' : '&') <<
+        escape(key, is_qchar) << '=' << escape(value, is_qchar);
+    first_param_ = false;
+}
+
+std::string uri_writer::string() const
+{
+    return stream_.str();
 }
 
 } // namespace libwallet

@@ -224,6 +224,20 @@ int main()
     BITCOIN_ASSERT(libwallet::parse_amount("1234.9", 0) == 1235);
     BITCOIN_ASSERT(libwallet::parse_amount("64.25", 5) == 6425000);
 
+    libwallet::uri_writer writer;
+    writer.write_address(std::string("113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD"));
+    writer.write_amount(120000);
+    writer.write_amount(10000000000);
+    writer.write_label("&=\n");
+    writer.write_message("hello bitcoin");
+    writer.write_r("http://example.com?purchase=shoes&user=bob");
+    BITCOIN_ASSERT(writer.string() ==
+        "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?"
+        "amount=0.0012&amount=100&"
+        "label=%26%3D%0A&"
+        "message=hello%20bitcoin&"
+        "r=http://example.com?purchase%3Dshoes%26user%3Dbob");
+
     return 0;
 }
 
