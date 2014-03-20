@@ -65,6 +65,14 @@ void test_uri_decode(std::string uri, bool strict=true)
 
 int main()
 {
+    BITCOIN_ASSERT(libwallet::parse_amount("4.432") == 443200000);
+    BITCOIN_ASSERT(
+        libwallet::parse_amount("4.432.") == libwallet::invalid_amount);
+    BITCOIN_ASSERT(libwallet::parse_amount("45.432") == 4543200000);
+    BITCOIN_ASSERT(libwallet::parse_amount("4.432112345") == 443211234);
+    BITCOIN_ASSERT(libwallet::parse_amount("4") == 400000000);
+    BITCOIN_ASSERT(libwallet::parse_amount(".") == 0);
+
     test_uri_parse("bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?label=test");
     test_uri_parse("bitcoin:");
     test_uri_parse("bitcorn:");

@@ -61,6 +61,8 @@ struct decoded_uri
 
 decoded_uri uri_decode(const std::string& uri, bool strict=true);
 
+constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
+
 /**
  * Parses a bitcoin amount string.
  * @return string value, in satoshis, or -1 for failure.

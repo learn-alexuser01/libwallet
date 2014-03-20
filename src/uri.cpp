@@ -19,9 +19,11 @@
  */
 #include <wallet/uri.hpp>
 
-#include <bitcoin/utility/base58.hpp>
 #include <algorithm>
-#include <stdlib.h>
+#include <cstdlib>
+#include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
+#include <bitcoin/utility/base58.hpp>
 
 namespace libwallet {
 
@@ -220,10 +222,38 @@ static bool check_amount(const std::string& amount)
 
 uint64_t parse_amount(const std::string& amount)
 {
-    if (!check_amount(amount))
-        return static_cast<uint64_t>(-1);
-    // This code might have numerical problems:
-    return static_cast<uint64_t>(100000000*strtod(amount.c_str(), nullptr));
+    // Split string at .
+    std::vector<std::string> segments;
+    boost::split(segments, amount, boost::is_any_of("."));
+    // Return false if not 1 or 2 parts.
+    if (segments.empty() || segments.size() > 2)
+        return invalid_amount;
+    // Integer and decimal part.
+    std::string integer_part = std::move(segments[0]);
+    std::string decimal_part = "0";
+    if (segments.size() == 2)
+        decimal_part = std::move(segments[1]);
+    // Handle cases where integer or decimal parts are empty strings.
+    if (integer_part.empty())
+        integer_part = "0";
+    if (decimal_part.empty())
+        decimal_part = "0";
+    // Trim 2nd value to maximum of 8 chars.
+    if (decimal_part.size() > 8)
+        decimal_part.resize(8);
+    uint64_t integer = 0, decimal = 0;
+    try
+    {
+        integer = boost::lexical_cast<uint64_t>(integer_part);
+        decimal = boost::lexical_cast<uint64_t>(decimal_part);
+    }
+    catch (boost::bad_lexical_cast)
+    {
+        return invalid_amount;
+    }
+    // Add number of neccessary 0s to the decimal part.
+    decimal *= std::pow(10, 8 - decimal_part.size());
+    return libbitcoin::coin_price(integer) + decimal;
 }
 
 } // namespace libwallet
