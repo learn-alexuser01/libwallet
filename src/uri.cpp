@@ -95,7 +95,7 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
     // URI scheme (this approach does not depend on the current locale):
     const char* lower = "bitcoin:";
     const char* upper = "BITCOIN:";
-    while (*lower)
+    while (*lower != '\0')
     {
         if (uri.end() == i || (*lower != *i && *upper != *i))
             return false;

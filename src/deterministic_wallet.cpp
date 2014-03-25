@@ -163,7 +163,7 @@ data_chunk deterministic_wallet::generate_public_key(
     hash_digest sequence = get_sequence(n, for_change);
 
     ssl_bignum x, y, z;
-    BN_bin2bn(sequence.data(), sequence.size(), z);
+    BN_bin2bn(sequence.data(), (int)sequence.size(), z);
     BN_bin2bn(master_public_key_.data(), 32, x);
     BN_bin2bn(master_public_key_.data() + 32, 32, y);
 
@@ -196,7 +196,7 @@ secret_parameter deterministic_wallet::generate_secret(
 
     ssl_bignum z;
     hash_digest sequence = get_sequence(n, for_change);
-    BN_bin2bn(sequence.data(), sequence.size(), z);
+    BN_bin2bn(sequence.data(), (int)sequence.size(), z);
 
     ec_group group(EC_GROUP_new_by_curve_name(NID_secp256k1));
     ssl_bignum order;
@@ -205,7 +205,7 @@ secret_parameter deterministic_wallet::generate_secret(
 
     // secexp = (stretched_seed + z) % order
     ssl_bignum secexp;
-    BN_bin2bn(stretched_seed_.data(), stretched_seed_.size(), secexp);
+    BN_bin2bn(stretched_seed_.data(), (int)stretched_seed_.size(), secexp);
     BN_add(secexp, secexp, z);
     BN_mod(secexp, secexp, order, ctx);
 

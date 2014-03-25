@@ -167,7 +167,7 @@ hd_public_key hd_public_key::generate_public_key(uint32_t i)
     data.reserve(33 + 4);
     extend_data(data, K_);
     extend_data(data, ser32(i));
-    auto I = hmac_sha512(c_.data(), c_.size(), data);
+    auto I = hmac_sha512(c_.data(), (int)c_.size(), data);
 
     //The returned child key Ki is point(parse256(IL)) + Kpar.
     ssl_ec_group group = EC_GROUP_new_by_curve_name(NID_secp256k1);
@@ -177,8 +177,8 @@ hd_public_key hd_public_key::generate_public_key(uint32_t i)
     ssl_ec_point Ki = EC_POINT_new(group);
     ssl_ec_point Kpar = EC_POINT_new(group);
     ssl_ec_point IL = EC_POINT_new(group);
-    ssl_bignum il = BN_bin2bn(I.IL.data(), I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), secp256k1_n.size(), nullptr);
+    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (!ctx || !Ki || !Kpar || !IL || !il || !n)
         return hd_public_key();
     if (!EC_POINT_oct2point(group, Kpar, K_.data(), K_.size(), ctx))
@@ -219,11 +219,11 @@ hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
   : hd_public_key()
 {
     const char hmac_key[] = "Bitcoin seed";
-    split_hmac I = hmac_sha512(hmac_key, strlen(hmac_key), seed);
+    split_hmac I = hmac_sha512(hmac_key, (int)strlen(hmac_key), seed);
 
     // The key is invalid if parse256(IL) >= n or 0:
-    ssl_bignum il = BN_bin2bn(I.IL.data(), I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), secp256k1_n.size(), nullptr);
+    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (0 <= BN_cmp(il, n) || BN_is_zero(il.ptr))
         return;
 
@@ -271,14 +271,14 @@ hd_private_key hd_private_key::generate_private_key(uint32_t i)
         extend_data(data, K_);
         extend_data(data, ser32(i));
     }
-    auto I = hmac_sha512(c_.data(), c_.size(), data);
+    auto I = hmac_sha512(c_.data(), (int)c_.size(), data);
 
     // The child key ki is (parse256(IL) + kpar) mod n:
     ssl_bn_ctx ctx = BN_CTX_new();
     ssl_bignum ki = BN_new();
-    ssl_bignum kpar = BN_bin2bn(k_.data(), k_.size(), nullptr);
-    ssl_bignum il = BN_bin2bn(I.IL.data(), I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), secp256k1_n.size(), nullptr);
+    ssl_bignum kpar = BN_bin2bn(k_.data(), (int)k_.size(), nullptr);
+    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (!ctx || !ki || !kpar || !il || !n)
         return hd_private_key();
     if (!BN_mod_add(ki, kpar, il, n, ctx))

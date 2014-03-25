@@ -19,7 +19,7 @@
  */
 #include <wallet/mnemonic.hpp>
 
-#ifdef _WINDOWS
+#ifdef _WIN32
 #include <stdint.h>
 #include <iostream>
 #endif
@@ -1708,10 +1708,10 @@ const std::string decode_mnemonic(const string_list& words)
     std::cout << std::endl;
     for (auto it = words.begin(); it != words_end; it += 3)
     {
-        const size_t n = common_words.size();
-        int index_1 = index_of(*it);
-        int index_2 = index_of(*(it + 1)) % n;
-        int index_3 = index_of(*(it + 2)) % n;
+        const int n = (int)common_words.size();
+        int index_1 = (int)index_of(*it);
+        int index_2 = (int)index_of(*(it + 1)) % n;
+        int index_3 = (int)index_of(*(it + 2)) % n;
         uint32_t val = index_1 +
             n * special_modulo(index_2 - index_1, n) +
             n * n * special_modulo(index_3 - index_2, n);

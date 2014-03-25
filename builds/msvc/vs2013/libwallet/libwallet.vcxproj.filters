@@ -1,45 +1,45 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\deterministic_wallet.cpp">
+    <ClCompile Include="..\..\..\..\src\deterministic_wallet.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\key_formats.cpp">
+    <ClCompile Include="..\..\..\..\src\key_formats.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\transaction.cpp">
+    <ClCompile Include="..\..\..\..\src\transaction.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\mnemonic.cpp">
+    <ClCompile Include="..\..\..\..\src\mnemonic.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\hd_keys.cpp">
+    <ClCompile Include="..\..\..\..\src\hd_keys.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\uri.cpp">
+    <ClCompile Include="..\..\..\..\src\uri.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\wallet\deterministic_wallet.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\deterministic_wallet.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\key_formats.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\key_formats.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\transaction.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\transaction.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\wallet.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\wallet.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\mnemonic.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\mnemonic.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\uri.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\uri.hpp">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\wallet\hd_keys.hpp">
+    <ClInclude Include="..\..\..\..\include\wallet\hd_keys.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
