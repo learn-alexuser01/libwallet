@@ -67,12 +67,12 @@
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>_CONSOLE;_DEBUG;_WINDOWS;_WIN32;_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\..\libbitcoin\bin\$(PlatformName)\$(ConfigurationName)\;..\..\..\..\libwallet\bin\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories);..\..\..\..\..\libbitcoin\bin\$(PlatformName)\$(ConfigurationName)\;..\..\..\..\libwallet\bin\$(PlatformName)\$(ConfigurationName)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>%(AdditionalDependencies);libwallet.lib;libbitcoin.lib</AdditionalDependencies>
       <DelayLoadDLLs>
       </DelayLoadDLLs>
@@ -87,7 +87,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions>_CONSOLE;_WINDOWS;_WIN32;_WIN32_WINNT=0x0600;BITCOIN_DISABLE_ASSERTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir)\..\..\..\include\;$(ProjectDir)\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\include\;$(ProjectDir)..\..\..\..\..\libbitcoin\include\</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>

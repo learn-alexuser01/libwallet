@@ -6,7 +6,9 @@ libwallet_la_SOURCES = \
     deterministic_wallet.cpp \
     mnemonic.cpp \
     transaction.cpp \
-    key_formats.cpp
+    hd_keys.cpp \
+    key_formats.cpp \
+    uri.cpp
 
 libwallet_la_LIBADD = $(libbitcoin_LIBS)
 

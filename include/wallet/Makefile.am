@@ -4,5 +4,7 @@ wallet_include_HEADERS = \
     key_formats.hpp \
     transaction.hpp \
     deterministic_wallet.hpp \
-    mnemonic.hpp
+    hd_keys.hpp \
+    mnemonic.hpp \
+    uri.hpp
 

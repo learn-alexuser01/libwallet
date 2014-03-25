@@ -13,6 +13,12 @@
     <ClCompile Include="..\..\..\src\mnemonic.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\hd_keys.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\uri.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\wallet\deterministic_wallet.hpp">
@@ -28,6 +34,12 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\wallet\mnemonic.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\wallet\uri.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\wallet\hd_keys.hpp">
       <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
