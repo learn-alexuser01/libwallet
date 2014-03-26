@@ -25,6 +25,12 @@
 
 namespace libwallet {
 
+static bool is_base58(char c)
+{
+    // This wrapper is necessary to prevent compiler from 
+    // choosing the wrong override of libbitcoin::is_base58.
+    return libbitcoin::is_base58(c);
+}
 static bool is_digit(char c)
 {
     return '0' <= c && c <= '9';
@@ -65,7 +71,7 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(char))
 {
     auto j = i;
     size_t count = 0;
-    while (end != i && (is_valid(*i) ||
+    while (end != i && (is_valid(i[0]) ||
         ('%' == *i && 2 < end - i && is_hex(i[1]) && is_hex(i[2]))))
     {
         ++count;
@@ -103,7 +109,7 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
     }
 
     // Payment address:
-    std::string address = unescape(i, uri.end(), libbitcoin::is_base58);
+    std::string address = unescape(i, uri.end(), (bool(*)(char))libbitcoin::is_base58);
     if (uri.end() != i && '?' != *i)
         return false;
     if (!address.empty() && !result.got_address(address))
