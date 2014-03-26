@@ -36,6 +36,15 @@
       <AdditionalOptions>/OPT:NOLBR /IGNORE:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
+  
+  <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
+    <Message Text="Linkage-zlib      : $(Linkage-zlib)" Importance="high"/>
+    <Message Text="Linkage-openssl   : $(Linkage-openssl)" Importance="high"/>
+  </Target>
+
+  <Target Name="CustomInfo" AfterTargets="Build" Condition="$(Configuration.IndexOf('SEXE')) != -1">
+    <Message Text="A LTCG warning on 'libeay32.lib(mem.obj)' is a the result of a COAPP OpenSSL packaging error and can be safely ignored." Importance="high"/>
+  </Target>
 
 </Project>
 

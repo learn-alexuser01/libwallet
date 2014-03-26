@@ -168,6 +168,22 @@
     <Import Project="$(ProjectDir)..\properties\StaticRelease.props" />
     <Import Project="$(ProjectDir)..\properties\x64.props" />
   </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLIB|Win32'">
+    <Linkage-zlib>static</Linkage-zlib>
+    <Linkage-openssl>static</Linkage-openssl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseLIB|x64'">
+    <Linkage-zlib>static</Linkage-zlib>
+    <Linkage-openssl>static</Linkage-openssl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLIB|Win32'">
+    <Linkage-zlib>static</Linkage-zlib>
+    <Linkage-openssl>static</Linkage-openssl>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugLIB|x64'">
+    <Linkage-zlib>static</Linkage-zlib>
+    <Linkage-openssl>static</Linkage-openssl>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

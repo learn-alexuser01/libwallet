@@ -18,4 +18,9 @@
     </ClCompile>
   </ItemDefinitionGroup>
 
+  <Target Name="LinkageInfo" BeforeTargets="PrepareForBuild">
+    <Message Text="Linkage-zlib      : $(Linkage-zlib)" Importance="high"/>
+    <Message Text="Linkage-openssl   : $(Linkage-openssl)" Importance="high"/>
+  </Target>
+
 </Project>
