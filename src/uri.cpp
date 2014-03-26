@@ -103,7 +103,7 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
     }
 
     // Payment address:
-    std::string address = unescape(i, uri.end(), libbitcoin::is_base58_char);
+    std::string address = unescape(i, uri.end(), libbitcoin::is_base58);
     if (uri.end() != i && '?' != *i)
         return false;
     if (!address.empty() && !result.got_address(address))
