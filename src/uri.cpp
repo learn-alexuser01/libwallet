@@ -25,21 +25,15 @@
 
 namespace libwallet {
 
-static bool is_base58(char c)
-{
-    // This wrapper is necessary to prevent compiler from 
-    // choosing the wrong override of libbitcoin::is_base58.
-    return libbitcoin::is_base58(c);
-}
-static bool is_digit(char c)
+static bool is_digit(const char c)
 {
     return '0' <= c && c <= '9';
 }
-static bool is_hex(char c)
+static bool is_hex(const char c)
 {
     return is_digit(c) || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f');
 }
-static bool is_qchar(char c)
+static bool is_qchar(const char c)
 {
     return
         ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || is_digit(c) ||
@@ -49,12 +43,12 @@ static bool is_qchar(char c)
         ':' == c || '@' == c || // pchar
         '/' == c || '?' == c;   // query
 }
-static bool isnt_amp(char c)
+static bool isnt_amp(const char c)
 {
     return '&' != c;
 }
 
-static unsigned from_hex(char c)
+static unsigned from_hex(const char c)
 {
     return
         'A' <= c && c <= 'F' ? 10 + c - 'A' :
@@ -67,7 +61,7 @@ static unsigned from_hex(char c)
  * @param i set to one-past the last-read character on return.
  */
 typedef std::string::const_iterator sci;
-static std::string unescape(sci& i, sci end, bool (*is_valid)(char))
+static std::string unescape(sci& i, sci end, bool (*is_valid)(const char))
 {
     auto j = i;
     size_t count = 0;
@@ -109,7 +103,7 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
     }
 
     // Payment address:
-    std::string address = unescape(i, uri.end(), is_base58);
+    std::string address = unescape(i, uri.end(), libbitcoin::is_base58_char);
     if (uri.end() != i && '?' != *i)
         return false;
     if (!address.empty() && !result.got_address(address))
