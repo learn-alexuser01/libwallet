@@ -13,7 +13,6 @@
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\..\include\;$(ProjectDir)..\..\..\..\..\libbitcoin\include\;(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4290;4275;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <EnablePREfast>false</EnablePREfast>
-      <!-- NOTE: LEVELDB_ENABLED note defined for libbitcoin. -->
       <PreprocessorDefinitions>_WIN32_WINNT=0x0600;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
