@@ -55,7 +55,11 @@ protected:
 
 bool uri_parse(const std::string& uri, uri_visitor& result, bool strict=true);
 
+#ifdef _WIN32
+constexpr uint64_t invalid_amount = UINT_LEAST64_MAX;
+#else
 constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
+#endif
 
 /**
  * Validates and parses an amount string according to the BIP 21 grammar.

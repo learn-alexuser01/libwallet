@@ -8,6 +8,7 @@ Makefile
 Makefile.in
 libwallet.pc
 
+bin
 obj
 .*.swp
 *~

@@ -25,15 +25,15 @@
 
 namespace libwallet {
 
-static bool is_digit(char c)
+static bool is_digit(const char c)
 {
     return '0' <= c && c <= '9';
 }
-static bool is_hex(char c)
+static bool is_hex(const char c)
 {
     return is_digit(c) || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f');
 }
-static bool is_qchar(char c)
+static bool is_qchar(const char c)
 {
     return
         ('A' <= c && c <= 'Z') || ('a' <= c && c <= 'z') || is_digit(c) ||
@@ -43,12 +43,12 @@ static bool is_qchar(char c)
         ':' == c || '@' == c || // pchar
         '/' == c || '?' == c;   // query
 }
-static bool isnt_amp(char c)
+static bool isnt_amp(const char c)
 {
     return '&' != c;
 }
 
-static unsigned from_hex(char c)
+static unsigned from_hex(const char c)
 {
     return
         'A' <= c && c <= 'F' ? 10 + c - 'A' :
@@ -61,11 +61,11 @@ static unsigned from_hex(char c)
  * @param i set to one-past the last-read character on return.
  */
 typedef std::string::const_iterator sci;
-static std::string unescape(sci& i, sci end, bool (*is_valid)(char))
+static std::string unescape(sci& i, sci end, bool (*is_valid)(const char))
 {
     auto j = i;
     size_t count = 0;
-    while (end != i && (is_valid(*i) ||
+    while (end != i && (is_valid(i[0]) ||
         ('%' == *i && 2 < end - i && is_hex(i[1]) && is_hex(i[2]))))
     {
         ++count;
@@ -95,7 +95,7 @@ bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
     // URI scheme (this approach does not depend on the current locale):
     const char* lower = "bitcoin:";
     const char* upper = "BITCOIN:";
-    while (*lower)
+    while (*lower != '\0')
     {
         if (uri.end() == i || (*lower != *i && *upper != *i))
             return false;
