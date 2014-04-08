@@ -146,7 +146,7 @@ std::string hd_public_key::serialize() const
 ser32_type hd_public_key::fingerprint() const
 {
     short_hash md = generate_ripemd_hash(K_);
-    return ser32_type{md[0], md[1], md[2], md[3]};
+    return ser32_type{{md[0], md[1], md[2], md[3]}};
 }
 
 payment_address hd_public_key::address() const
@@ -227,7 +227,7 @@ hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
     if (0 <= BN_cmp(il, n) || BN_is_zero(il.ptr))
         return;
 
-    *this = hd_private_key(I.IL, I.IR, hd_key_lineage{testnet, 0, {0}, 0});
+    *this = hd_private_key(I.IL, I.IR, hd_key_lineage{testnet, 0, {{0}}, 0});
 }
 
 const secret_parameter& hd_private_key::private_key() const
