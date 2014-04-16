@@ -42,6 +42,9 @@
     <ClInclude Include="..\..\..\..\include\wallet\hd_keys.hpp">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\include\wallet\define.hpp">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="src">

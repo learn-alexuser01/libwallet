@@ -23,7 +23,7 @@
 
 namespace libwallet {
 
-WALLET_API select_outputs_result select_outputs(
+BCW_API select_outputs_result select_outputs(
     output_info_list unspent, uint64_t min_value,
     select_outputs_algorithm alg)
 {

@@ -89,7 +89,7 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(const char))
  * false allows these malformed URI's to parse anyhow.
  * @return false if the URI is malformed.
  */
-WALLET_API bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
+BCW_API bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
 {
     auto i = uri.begin();
 
@@ -131,7 +131,7 @@ WALLET_API bool uri_parse(const std::string& uri, uri_visitor& result, bool stri
     return true;
 }
 
-WALLET_API bool uri_parse_result::got_address(std::string& address)
+BCW_API bool uri_parse_result::got_address(std::string& address)
 {
     libbitcoin::payment_address payaddr;
     if (!payaddr.set_encoded(address))
@@ -140,7 +140,7 @@ WALLET_API bool uri_parse_result::got_address(std::string& address)
     return true;
 }
 
-WALLET_API bool uri_parse_result::got_param(std::string& key, std::string& value)
+BCW_API bool uri_parse_result::got_param(std::string& key, std::string& value)
 {
     if (key == "amount")
     {
@@ -160,7 +160,7 @@ WALLET_API bool uri_parse_result::got_param(std::string& key, std::string& value
     return true;
 }
 
-WALLET_API uint64_t parse_amount(const std::string& amount, unsigned decmial_place)
+BCW_API uint64_t parse_amount(const std::string& amount, unsigned decmial_place)
 {
     auto i = amount.begin();
     uint64_t value = 0;
@@ -210,18 +210,18 @@ static std::string escape(const std::string& in, bool (*is_valid)(char))
     return stream.str();
 }
 
-WALLET_API uri_writer::uri_writer()
+BCW_API uri_writer::uri_writer()
   : first_param_{true}
 {
     stream_ << "bitcoin:";
 }
 
-WALLET_API void uri_writer::write_address(const libbitcoin::payment_address& address)
+BCW_API void uri_writer::write_address(const libbitcoin::payment_address& address)
 {
     write_address(address.encoded());
 }
 
-WALLET_API void uri_writer::write_amount(uint64_t satoshis)
+BCW_API void uri_writer::write_amount(uint64_t satoshis)
 {
     // Format as a fixed-point number:
     uint64_t bitcoin = satoshis / libbitcoin::coin_price();
@@ -235,34 +235,34 @@ WALLET_API void uri_writer::write_amount(uint64_t satoshis)
     write_param("amount", string);
 }
 
-WALLET_API void uri_writer::write_label(const std::string& label)
+BCW_API void uri_writer::write_label(const std::string& label)
 {
     write_param("label", label);
 }
 
-WALLET_API void uri_writer::write_message(const std::string& message)
+BCW_API void uri_writer::write_message(const std::string& message)
 {
     write_param("message", message);
 }
 
-WALLET_API void uri_writer::write_r(const std::string& r)
+BCW_API void uri_writer::write_r(const std::string& r)
 {
     write_param("r", r);
 }
 
-WALLET_API void uri_writer::write_address(const std::string& address)
+BCW_API void uri_writer::write_address(const std::string& address)
 {
     stream_ << address;
 }
 
-WALLET_API void uri_writer::write_param(const std::string& key, const std::string& value)
+BCW_API void uri_writer::write_param(const std::string& key, const std::string& value)
 {
     stream_ << (first_param_ ? '?' : '&') <<
         escape(key, is_qchar) << '=' << escape(value, is_qchar);
     first_param_ = false;
 }
 
-WALLET_API std::string uri_writer::string() const
+BCW_API std::string uri_writer::string() const
 {
     return stream_.str();
 }

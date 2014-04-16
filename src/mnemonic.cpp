@@ -1662,7 +1662,7 @@ string_list common_words{
 "weary"
 };
 
-string_list encode_mnemonic(const std::string& seed)
+BCW_API string_list encode_mnemonic(const std::string& seed)
 {
     BITCOIN_ASSERT(common_words.size() == 1626);
     string_list result;
@@ -1701,7 +1701,7 @@ uint32_t special_modulo(int u, int v)
     return u % v;
 }
 
-const std::string decode_mnemonic(const string_list& words)
+BCW_API const std::string decode_mnemonic(const string_list& words)
 {
     std::ostringstream ss;
     ss << std::hex;

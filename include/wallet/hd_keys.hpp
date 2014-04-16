@@ -19,9 +19,9 @@
 #ifndef LIBWALLET_HD_KEYS_HPP
 #define LIBWALLET_HD_KEYS_HPP
 
-#include <wallet/define.hpp>
 #include <bitcoin/address.hpp>
 #include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 
@@ -35,7 +35,7 @@ constexpr uint32_t first_hardened_key = 1 << 31;
 /**
  * Key derivation information used in the serialization format.
  */
-struct WALLET_API hd_key_lineage
+struct BCW_API hd_key_lineage
 {
     bool testnet;
     uint8_t depth;
@@ -49,20 +49,20 @@ struct WALLET_API hd_key_lineage
 class hd_public_key
 {
 public:
-    WALLET_API hd_public_key();
-    WALLET_API hd_public_key(const data_chunk& public_key,
+    BCW_API hd_public_key();
+    BCW_API hd_public_key(const data_chunk& public_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
 
-    WALLET_API bool valid() const;
+    BCW_API bool valid() const;
 
-    WALLET_API const data_chunk& public_key() const;
-    WALLET_API const chain_code_type& chain_code() const;
-    WALLET_API const hd_key_lineage& lineage() const;
-    WALLET_API std::string serialize() const;
-    WALLET_API ser32_type fingerprint() const;
-    WALLET_API payment_address address() const;
+    BCW_API const data_chunk& public_key() const;
+    BCW_API const chain_code_type& chain_code() const;
+    BCW_API const hd_key_lineage& lineage() const;
+    BCW_API std::string serialize() const;
+    BCW_API ser32_type fingerprint() const;
+    BCW_API payment_address address() const;
 
-    WALLET_API hd_public_key generate_public_key(uint32_t i);
+    BCW_API hd_public_key generate_public_key(uint32_t i);
 
 protected:
     bool valid_;
@@ -78,16 +78,16 @@ class hd_private_key
   : public hd_public_key
 {
 public:
-    WALLET_API hd_private_key();
-    WALLET_API hd_private_key(const secret_parameter& private_key,
+    BCW_API hd_private_key();
+    BCW_API hd_private_key(const secret_parameter& private_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
-    WALLET_API hd_private_key(const data_chunk& seed, bool testnet=false);
+    BCW_API hd_private_key(const data_chunk& seed, bool testnet=false);
 
-    WALLET_API const secret_parameter& private_key() const;
-    WALLET_API std::string serialize() const;
+    BCW_API const secret_parameter& private_key() const;
+    BCW_API std::string serialize() const;
 
-    WALLET_API hd_private_key generate_private_key(uint32_t i);
-    WALLET_API hd_public_key generate_public_key(uint32_t i);
+    BCW_API hd_private_key generate_private_key(uint32_t i);
+    BCW_API hd_public_key generate_public_key(uint32_t i);
 
 protected:
     secret_parameter k_;

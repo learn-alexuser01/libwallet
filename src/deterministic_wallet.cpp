@@ -93,7 +93,7 @@ const data_chunk bignum_data(BIGNUM* bn)
     return result;
 }
 
-WALLET_API void deterministic_wallet::new_seed()
+BCW_API void deterministic_wallet::new_seed()
 {
     constexpr size_t bits_needed = 8 * seed_size / 2;
     ssl_bignum rand_value;
@@ -128,7 +128,7 @@ data_chunk pubkey_from_secret(const secret_parameter& secret)
     return privkey.public_key();
 }
 
-WALLET_API bool deterministic_wallet::set_seed(std::string seed)
+BCW_API bool deterministic_wallet::set_seed(std::string seed)
 {
     // Trim spaces and newlines around the string.
     boost::algorithm::trim(seed);
@@ -143,22 +143,22 @@ WALLET_API bool deterministic_wallet::set_seed(std::string seed)
         return false;
     return true;
 }
-WALLET_API const std::string& deterministic_wallet::seed() const
+BCW_API const std::string& deterministic_wallet::seed() const
 {
     return seed_;
 }
 
-WALLET_API bool deterministic_wallet::set_master_public_key(const data_chunk& mpk)
+BCW_API bool deterministic_wallet::set_master_public_key(const data_chunk& mpk)
 {
     master_public_key_ = mpk;
     return true;
 }
-WALLET_API const data_chunk& deterministic_wallet::master_public_key() const
+BCW_API const data_chunk& deterministic_wallet::master_public_key() const
 {
     return master_public_key_;
 }
 
-WALLET_API data_chunk deterministic_wallet::generate_public_key(
+BCW_API data_chunk deterministic_wallet::generate_public_key(
     size_t n, bool for_change) const
 {
     hash_digest sequence = get_sequence(n, for_change);
@@ -189,7 +189,7 @@ WALLET_API data_chunk deterministic_wallet::generate_public_key(
     return raw_pubkey;
 }
 
-WALLET_API secret_parameter deterministic_wallet::generate_secret(
+BCW_API secret_parameter deterministic_wallet::generate_secret(
     size_t n, bool for_change) const
 {
     if (seed_.empty())

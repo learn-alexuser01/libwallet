@@ -99,38 +99,38 @@ static ser32_type ser32(uint32_t i)
     return out;
 }
 
-WALLET_API hd_public_key::hd_public_key()
+BCW_API hd_public_key::hd_public_key()
   : valid_(false)
 {
 }
 
-WALLET_API hd_public_key::hd_public_key(const data_chunk& public_key,
+BCW_API hd_public_key::hd_public_key(const data_chunk& public_key,
     const chain_code_type& chain_code, hd_key_lineage lineage)
   : valid_(true), K_(public_key), c_(chain_code), lineage_(lineage)
 {
 }
 
-WALLET_API bool hd_public_key::valid() const
+BCW_API bool hd_public_key::valid() const
 {
     return valid_;
 }
 
-WALLET_API const data_chunk& hd_public_key::public_key() const
+BCW_API const data_chunk& hd_public_key::public_key() const
 {
     return K_;
 }
 
-WALLET_API const chain_code_type& hd_public_key::chain_code() const
+BCW_API const chain_code_type& hd_public_key::chain_code() const
 {
     return c_;
 }
 
-WALLET_API const hd_key_lineage& hd_public_key::lineage() const
+BCW_API const hd_key_lineage& hd_public_key::lineage() const
 {
     return lineage_;
 }
 
-WALLET_API std::string hd_public_key::serialize() const
+BCW_API std::string hd_public_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
@@ -147,20 +147,20 @@ WALLET_API std::string hd_public_key::serialize() const
     return encode_base58(data);
 }
 
-WALLET_API ser32_type hd_public_key::fingerprint() const
+BCW_API ser32_type hd_public_key::fingerprint() const
 {
     short_hash md = generate_ripemd_hash(K_);
     return ser32_type{{md[0], md[1], md[2], md[3]}};
 }
 
-WALLET_API payment_address hd_public_key::address() const
+BCW_API payment_address hd_public_key::address() const
 {
     payment_address address;
     set_public_key(address, K_);
     return address;
 }
 
-WALLET_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
 {
     if (!valid_)
         return hd_private_key();
@@ -208,19 +208,19 @@ WALLET_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
         static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
 }
 
-WALLET_API hd_private_key::hd_private_key()
+BCW_API hd_private_key::hd_private_key()
   : hd_public_key()
 {
 }
 
-WALLET_API hd_private_key::hd_private_key(const secret_parameter& private_key,
+BCW_API hd_private_key::hd_private_key(const secret_parameter& private_key,
     const chain_code_type& chain_code, hd_key_lineage lineage)
   : hd_public_key(secret_to_public_key(private_key), chain_code, lineage),
     k_(private_key)
 {
 }
 
-WALLET_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
+BCW_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
   : hd_public_key()
 {
     const char hmac_key[] = "Bitcoin seed";
@@ -236,12 +236,12 @@ WALLET_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
     *this = hd_private_key(I.IL, I.IR, hd_key_lineage{testnet, 0, {{0}}, 0});
 }
 
-WALLET_API const secret_parameter& hd_private_key::private_key() const
+BCW_API const secret_parameter& hd_private_key::private_key() const
 {
     return k_;
 }
 
-WALLET_API std::string hd_private_key::serialize() const
+BCW_API std::string hd_private_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
@@ -259,7 +259,7 @@ WALLET_API std::string hd_private_key::serialize() const
     return encode_base58(data);
 }
 
-WALLET_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
+BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
 {
     if (!valid_)
         return hd_private_key();
@@ -304,7 +304,7 @@ WALLET_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
         static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
 }
 
-WALLET_API hd_public_key hd_private_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_private_key::generate_public_key(uint32_t i)
 {
     return generate_private_key(i);
 }

@@ -19,15 +19,15 @@
 #ifndef LIBWALLET_TRANSACTION_HPP
 #define LIBWALLET_TRANSACTION_HPP
 
-#include <wallet/define.hpp>
 #include <bitcoin/transaction.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 
 using namespace libbitcoin;
 
 // Result for call to select_outputs()
-struct WALLET_API select_outputs_result
+struct BCW_API select_outputs_result
 {
     output_point_list points;
     uint64_t change;
@@ -44,7 +44,7 @@ enum class select_outputs_algorithm
  * Returns output list and remaining change to be sent to
  * a change address.
  */
-WALLET_API select_outputs_result select_outputs(
+BCW_API select_outputs_result select_outputs(
     output_info_list unspent, uint64_t min_value,
     select_outputs_algorithm alg=select_outputs_algorithm::greedy);
 
