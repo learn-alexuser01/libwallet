@@ -34,7 +34,8 @@ class auto_free
 public:
     auto_free(T* p)
       : ptr(p)
-    {}
+    {
+    }
     ~auto_free()
     {
         destroy(ptr);
@@ -70,11 +71,13 @@ static data_chunk secret_to_public_key(const secret_parameter& secret)
 /**
  * Corresponds to a split HMAC-SHA256 result, as used in BIP 32.
  */
-struct split_hmac {
+struct split_hmac
+{
     std::array<uint8_t, 32> IL;
     std::array<uint8_t, 32> IR;
 };
-static split_hmac hmac_sha512(const void* key, int key_len, const data_chunk& data)
+static split_hmac hmac_sha512(
+    const void* key, int key_len, const data_chunk& data)
 {
     std::array<uint8_t, 64> hmac;
     HMAC(EVP_sha512(), key, key_len, data.data(), data.size(),
@@ -178,7 +181,8 @@ hd_public_key hd_public_key::generate_public_key(uint32_t i)
     ssl_ec_point Kpar = EC_POINT_new(group);
     ssl_ec_point IL = EC_POINT_new(group);
     ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(
+        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (!ctx || !Ki || !Kpar || !IL || !il || !n)
         return hd_public_key();
     if (!EC_POINT_oct2point(group, Kpar, K_.data(), K_.size(), ctx))
@@ -223,7 +227,8 @@ hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
 
     // The key is invalid if parse256(IL) >= n or 0:
     ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(
+        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (0 <= BN_cmp(il, n) || BN_is_zero(il.ptr))
         return;
 
@@ -278,7 +283,8 @@ hd_private_key hd_private_key::generate_private_key(uint32_t i)
     ssl_bignum ki = BN_new();
     ssl_bignum kpar = BN_bin2bn(k_.data(), (int)k_.size(), nullptr);
     ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(
+        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (!ctx || !ki || !kpar || !il || !n)
         return hd_private_key();
     if (!BN_mod_add(ki, kpar, il, n, ctx))

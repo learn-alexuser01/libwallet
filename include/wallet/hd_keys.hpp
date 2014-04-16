@@ -34,7 +34,8 @@ constexpr uint32_t first_hardened_key = 1 << 31;
 /**
  * Key derivation information used in the serialization format.
  */
-struct hd_key_lineage {
+struct hd_key_lineage
+{
     bool testnet;
     uint8_t depth;
     ser32_type parent_fingerprint;
@@ -72,7 +73,8 @@ protected:
 /**
  * An extended private key, as defined by BIP 32.
  */
-class hd_private_key: public hd_public_key
+class hd_private_key
+  : public hd_public_key
 {
 public:
     hd_private_key();
