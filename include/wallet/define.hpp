@@ -22,8 +22,22 @@
 
 #include <bitcoin/define.hpp>
 
-// Do your magic Eric...
-// If you need a custom prefix, then consider BCW_API
+// Now we use the generic helper definitions in libbitcoin to
+// define BCW_API and BCW_INTERNAL.
+// BCW_API is used for the public API symbols. It either DLL imports or
+// DLL exports (or does nothing for static build)
+// BCW_INTERNAL is used for non-api symbols.
+
+#if defined BCW_STATIC
+#define BCW_API
+#define BCW_INTERNAL
+#elif defined BCW_DLL
+#define BCW_API      BC_HELPER_DLL_EXPORT
+#define BCW_INTERNAL BC_HELPER_DLL_LOCAL
+#else
+#define BCW_API      BC_HELPER_DLL_IMPORT
+#define BCW_INTERNAL BC_HELPER_DLL_LOCAL
+#endif
 
 #endif
 

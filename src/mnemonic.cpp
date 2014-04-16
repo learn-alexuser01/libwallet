@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/mnemonic.hpp>
 
 #ifdef _WIN32
@@ -1661,7 +1662,7 @@ string_list common_words{
 "weary"
 };
 
-string_list encode_mnemonic(const std::string& seed)
+BCW_API string_list encode_mnemonic(const std::string& seed)
 {
     BITCOIN_ASSERT(common_words.size() == 1626);
     string_list result;
@@ -1700,7 +1701,7 @@ uint32_t special_modulo(int u, int v)
     return u % v;
 }
 
-const std::string decode_mnemonic(const string_list& words)
+BCW_API const std::string decode_mnemonic(const string_list& words)
 {
     std::ostringstream ss;
     ss << std::hex;

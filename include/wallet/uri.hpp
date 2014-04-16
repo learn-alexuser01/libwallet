@@ -23,13 +23,13 @@
 
 #include <sstream>
 #include <boost/optional.hpp>
-#include <bitcoin/define.hpp>
+#include <wallet/define.hpp>
 #include <bitcoin/address.hpp>
 #include <wallet/define.hpp>
 
 namespace libwallet {
 
-class BC_API uri_visitor
+class BCW_API uri_visitor
 {
 public:
     virtual bool got_address(std::string& address) = 0;
@@ -40,7 +40,7 @@ public:
  * A decoded bitcoin URI corresponding to BIP 21 and BIP 72.
  * All string members are UTF-8.
  */
-class BC_API uri_parse_result
+class BCW_API uri_parse_result
   : public uri_visitor
 {
 public:
@@ -58,7 +58,7 @@ public:
     bool got_param(std::string& key, std::string& value);
 };
 
-BC_API bool uri_parse(const std::string& uri,
+BCW_API bool uri_parse(const std::string& uri,
     uri_visitor& result, bool strict=true);
 
 #ifdef _WIN32
@@ -73,7 +73,7 @@ constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
  * value converts bitcoins to satoshis.
  * @return parsed value, or invalid_amount for failure.
  */
-BC_API uint64_t parse_amount(const std::string& amount,
+BCW_API uint64_t parse_amount(const std::string& amount,
     unsigned decimal_place=8);
 
 /**
@@ -82,20 +82,20 @@ BC_API uint64_t parse_amount(const std::string& amount,
 class uri_writer
 {
 public:
-    BC_API uri_writer();
+    BCW_API uri_writer();
 
     // Formatted:
-    BC_API void write_address(const libbitcoin::payment_address& address);
-    BC_API void write_amount(uint64_t satoshis);
-    BC_API void write_label(const std::string& label);
-    BC_API void write_message(const std::string& message);
-    BC_API void write_r(const std::string& r);
+    BCW_API void write_address(const libbitcoin::payment_address& address);
+    BCW_API void write_amount(uint64_t satoshis);
+    BCW_API void write_label(const std::string& label);
+    BCW_API void write_message(const std::string& message);
+    BCW_API void write_r(const std::string& r);
 
     // Raw:
-    BC_API void write_address(const std::string& address);
-    BC_API void write_param(const std::string& key, const std::string& value);
+    BCW_API void write_address(const std::string& address);
+    BCW_API void write_param(const std::string& key, const std::string& value);
 
-    BC_API std::string string() const;
+    BCW_API std::string string() const;
 
 private:
     std::ostringstream stream_;

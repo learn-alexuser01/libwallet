@@ -26,6 +26,7 @@
   
   <ImportGroup Label="PropertySheets">
     <Import Project="$(SolutionDir)obelisk.import.props" />
+    <Import Project="$(SolutionDir)libwallet.import.props" />
     <Import Project="$(SolutionDir)libbitcoin.import.props" />
   </ImportGroup>
 
@@ -37,6 +38,7 @@
     <Linkage-libzmq>dynamic</Linkage-libzmq>
     <Linkage-libsodium>dynamic</Linkage-libsodium>
     <Linkage-obelisk>dynamic</Linkage-obelisk>
+    <Linkage-libwallet>dynamic</Linkage-libwallet>
     <Linkage-libbitcoin>dynamic</Linkage-libbitcoin>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.IndexOf('LEXE')) != -1">
@@ -47,6 +49,7 @@
     <Linkage-libzmq>ltcg</Linkage-libzmq>
     <Linkage-libsodium>ltcg</Linkage-libsodium>
     <Linkage-obelisk>ltcg</Linkage-obelisk>
+    <Linkage-libwallet>ltcg</Linkage-libwallet>
     <Linkage-libbitcoin>ltcg</Linkage-libbitcoin>
   </PropertyGroup>
   <PropertyGroup Condition="$(Configuration.IndexOf('SEXE')) != -1">
@@ -57,6 +60,7 @@
     <Linkage-libzmq>static</Linkage-libzmq>
     <Linkage-libsodium>static</Linkage-libsodium>
     <Linkage-obelisk>static</Linkage-obelisk>
+    <Linkage-libwallet>static</Linkage-libwallet>
     <Linkage-libbitcoin>static</Linkage-libbitcoin>
   </PropertyGroup>
 
@@ -70,6 +74,7 @@
     <Message Text="Linkage-libzmq    : $(Linkage-libzmq)" Importance="high"/>
     <Message Text="Linkage-libsodium : $(Linkage-libsodium)" Importance="high"/>
     <Message Text="Linkage-obelisk   : $(Linkage-obelisk)" Importance="high"/>
+    <Message Text="Linkage-libwallet : $(Linkage-libwallet)" Importance="high"/>
     <Message Text="Linkage-libbitcoin: $(Linkage-libbitcoin)" Importance="high"/>
   </Target>
 

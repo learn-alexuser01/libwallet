@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/hd_keys.hpp>
 
 #include <algorithm>
@@ -98,38 +99,38 @@ static ser32_type ser32(uint32_t i)
     return out;
 }
 
-hd_public_key::hd_public_key()
+BCW_API hd_public_key::hd_public_key()
   : valid_(false)
 {
 }
 
-hd_public_key::hd_public_key(const data_chunk& public_key,
+BCW_API hd_public_key::hd_public_key(const data_chunk& public_key,
     const chain_code_type& chain_code, hd_key_lineage lineage)
   : valid_(true), K_(public_key), c_(chain_code), lineage_(lineage)
 {
 }
 
-bool hd_public_key::valid() const
+BCW_API bool hd_public_key::valid() const
 {
     return valid_;
 }
 
-const data_chunk& hd_public_key::public_key() const
+BCW_API const data_chunk& hd_public_key::public_key() const
 {
     return K_;
 }
 
-const chain_code_type& hd_public_key::chain_code() const
+BCW_API const chain_code_type& hd_public_key::chain_code() const
 {
     return c_;
 }
 
-const hd_key_lineage& hd_public_key::lineage() const
+BCW_API const hd_key_lineage& hd_public_key::lineage() const
 {
     return lineage_;
 }
 
-std::string hd_public_key::serialize() const
+BCW_API std::string hd_public_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
@@ -146,20 +147,20 @@ std::string hd_public_key::serialize() const
     return encode_base58(data);
 }
 
-ser32_type hd_public_key::fingerprint() const
+BCW_API ser32_type hd_public_key::fingerprint() const
 {
     short_hash md = generate_ripemd_hash(K_);
     return ser32_type{{md[0], md[1], md[2], md[3]}};
 }
 
-payment_address hd_public_key::address() const
+BCW_API payment_address hd_public_key::address() const
 {
     payment_address address;
     set_public_key(address, K_);
     return address;
 }
 
-hd_public_key hd_public_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
 {
     if (!valid_)
         return hd_private_key();
@@ -207,19 +208,19 @@ hd_public_key hd_public_key::generate_public_key(uint32_t i)
         static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
 }
 
-hd_private_key::hd_private_key()
+BCW_API hd_private_key::hd_private_key()
   : hd_public_key()
 {
 }
 
-hd_private_key::hd_private_key(const secret_parameter& private_key,
+BCW_API hd_private_key::hd_private_key(const secret_parameter& private_key,
     const chain_code_type& chain_code, hd_key_lineage lineage)
   : hd_public_key(secret_to_public_key(private_key), chain_code, lineage),
     k_(private_key)
 {
 }
 
-hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
+BCW_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
   : hd_public_key()
 {
     const char hmac_key[] = "Bitcoin seed";
@@ -235,12 +236,12 @@ hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
     *this = hd_private_key(I.IL, I.IR, hd_key_lineage{testnet, 0, {{0}}, 0});
 }
 
-const secret_parameter& hd_private_key::private_key() const
+BCW_API const secret_parameter& hd_private_key::private_key() const
 {
     return k_;
 }
 
-std::string hd_private_key::serialize() const
+BCW_API std::string hd_private_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
@@ -258,7 +259,7 @@ std::string hd_private_key::serialize() const
     return encode_base58(data);
 }
 
-hd_private_key hd_private_key::generate_private_key(uint32_t i)
+BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
 {
     if (!valid_)
         return hd_private_key();
@@ -303,7 +304,7 @@ hd_private_key hd_private_key::generate_private_key(uint32_t i)
         static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
 }
 
-hd_public_key hd_private_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_private_key::generate_public_key(uint32_t i)
 {
     return generate_private_key(i);
 }
