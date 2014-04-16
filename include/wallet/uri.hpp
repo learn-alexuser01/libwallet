@@ -23,11 +23,14 @@
 
 #include <sstream>
 #include <boost/optional.hpp>
+#include <bitcoin/define.hpp>
 #include <bitcoin/address.hpp>
 
 namespace libwallet {
 
-struct uri_visitor {
+class BC_API uri_visitor
+{
+public:
     virtual bool got_address(std::string& address) = 0;
     virtual bool got_param(std::string& key, std::string& value) = 0;
 };
@@ -36,8 +39,10 @@ struct uri_visitor {
  * A decoded bitcoin URI corresponding to BIP 21 and BIP 72.
  * All string members are UTF-8.
  */
-struct uri_parse_result: public uri_visitor
+class BC_API uri_parse_result
+  : public uri_visitor
 {
+public:
     typedef boost::optional<libbitcoin::payment_address> optional_address;
     typedef boost::optional<uint64_t> optional_amount;
     typedef boost::optional<std::string> optional_string;
@@ -48,12 +53,12 @@ struct uri_parse_result: public uri_visitor
     optional_string message;
     optional_string r;
 
-protected:
-    virtual bool got_address(std::string& address);
-    virtual bool got_param(std::string& key, std::string& value);
+    bool got_address(std::string& address);
+    bool got_param(std::string& key, std::string& value);
 };
 
-bool uri_parse(const std::string& uri, uri_visitor& result, bool strict=true);
+BC_API bool uri_parse(const std::string& uri,
+    uri_visitor& result, bool strict=true);
 
 #ifdef _WIN32
 constexpr uint64_t invalid_amount = UINT_LEAST64_MAX;
@@ -67,7 +72,8 @@ constexpr uint64_t invalid_amount = std::numeric_limits<uint64_t>::max();
  * value converts bitcoins to satoshis.
  * @return parsed value, or invalid_amount for failure.
  */
-uint64_t parse_amount(const std::string& amount, unsigned decimal_place=8);
+BC_API uint64_t parse_amount(const std::string& amount,
+    unsigned decimal_place=8);
 
 /**
  * Assembles a bitcoin URI string.
@@ -75,20 +81,20 @@ uint64_t parse_amount(const std::string& amount, unsigned decimal_place=8);
 class uri_writer
 {
 public:
-    uri_writer();
+    BC_API uri_writer();
 
     // Formatted:
-    void write_address(const libbitcoin::payment_address& address);
-    void write_amount(uint64_t satoshis);
-    void write_label(const std::string& label);
-    void write_message(const std::string& message);
-    void write_r(const std::string& r);
+    BC_API void write_address(const libbitcoin::payment_address& address);
+    BC_API void write_amount(uint64_t satoshis);
+    BC_API void write_label(const std::string& label);
+    BC_API void write_message(const std::string& message);
+    BC_API void write_r(const std::string& r);
 
     // Raw:
-    void write_address(const std::string& address);
-    void write_param(const std::string& key, const std::string& value);
+    BC_API void write_address(const std::string& address);
+    BC_API void write_param(const std::string& key, const std::string& value);
 
-    std::string string() const;
+    BC_API std::string string() const;
 
 private:
     std::ostringstream stream_;

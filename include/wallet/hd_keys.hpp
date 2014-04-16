@@ -19,6 +19,7 @@
 #ifndef LIBWALLET_HD_KEYS_HPP
 #define LIBWALLET_HD_KEYS_HPP
 
+#include <bitcoin/define.hpp>
 #include <bitcoin/address.hpp>
 #include <bitcoin/utility/elliptic_curve_key.hpp>
 
@@ -34,7 +35,7 @@ constexpr uint32_t first_hardened_key = 1 << 31;
 /**
  * Key derivation information used in the serialization format.
  */
-struct hd_key_lineage
+struct BC_API hd_key_lineage
 {
     bool testnet;
     uint8_t depth;
@@ -48,20 +49,20 @@ struct hd_key_lineage
 class hd_public_key
 {
 public:
-    hd_public_key();
-    hd_public_key(const data_chunk& public_key,
+    BC_API hd_public_key();
+    BC_API hd_public_key(const data_chunk& public_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
 
-    bool valid() const;
+    BC_API bool valid() const;
 
-    const data_chunk& public_key() const;
-    const chain_code_type& chain_code() const;
-    const hd_key_lineage& lineage() const;
-    std::string serialize() const;
-    ser32_type fingerprint() const;
-    payment_address address() const;
+    BC_API const data_chunk& public_key() const;
+    BC_API const chain_code_type& chain_code() const;
+    BC_API const hd_key_lineage& lineage() const;
+    BC_API std::string serialize() const;
+    BC_API ser32_type fingerprint() const;
+    BC_API payment_address address() const;
 
-    hd_public_key generate_public_key(uint32_t i);
+    BC_API hd_public_key generate_public_key(uint32_t i);
 
 protected:
     bool valid_;
@@ -77,16 +78,16 @@ class hd_private_key
   : public hd_public_key
 {
 public:
-    hd_private_key();
-    hd_private_key(const secret_parameter& private_key,
+    BC_API hd_private_key();
+    BC_API hd_private_key(const secret_parameter& private_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
-    hd_private_key(const data_chunk& seed, bool testnet=false);
+    BC_API hd_private_key(const data_chunk& seed, bool testnet=false);
 
-    const secret_parameter& private_key() const;
-    std::string serialize() const;
+    BC_API const secret_parameter& private_key() const;
+    BC_API std::string serialize() const;
 
-    hd_private_key generate_private_key(uint32_t i);
-    hd_public_key generate_public_key(uint32_t i);
+    BC_API hd_private_key generate_private_key(uint32_t i);
+    BC_API hd_public_key generate_public_key(uint32_t i);
 
 protected:
     secret_parameter k_;

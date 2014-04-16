@@ -19,6 +19,7 @@
 #ifndef LIBWALLET_DETERMINISTIC_WALLET_HPP
 #define LIBWALLET_DETERMINISTIC_WALLET_HPP
 
+#include <bitcoin/define.hpp>
 #include <bitcoin/types.hpp>
 #include <bitcoin/utility/elliptic_curve_key.hpp>
 
@@ -43,7 +44,7 @@ public:
      * log_info() << "new seed: " << wallet.seed();
      * @endcode
      */
-    void new_seed();
+    BC_API void new_seed();
 
     /**
      * Restore wallet from seed.
@@ -53,7 +54,7 @@ public:
      *   // Error...
      * @endcode
      */
-    bool set_seed(std::string seed);
+    BC_API bool set_seed(std::string seed);
 
     /**
      * Return the wallet seed. The seed should always be
@@ -61,10 +62,10 @@ public:
      *
      * @return  Wallet seed. Empty string if not existant.
      */
-    const std::string& seed() const;
+    BC_API const std::string& seed() const;
 
-    bool set_master_public_key(const data_chunk& mpk);
-    const data_chunk& master_public_key() const;
+    BC_API bool set_master_public_key(const data_chunk& mpk);
+    BC_API const data_chunk& master_public_key() const;
 
     /**
      * Generate the n'th public key. A seed or master_public_key must be set.
@@ -75,7 +76,8 @@ public:
      * btc_address = addr.encoded();
      * @endcode
      */
-    data_chunk generate_public_key(size_t n, bool for_change=false) const;
+    BC_API data_chunk generate_public_key(
+        size_t n, bool for_change=false) const;
 
     /**
      * Generate the n'th secret. A seed must be set.
@@ -89,7 +91,8 @@ public:
      * privkey.set_secret(wallet.generate_secret(2));
      * @endcode
      */
-    secret_parameter generate_secret(size_t n, bool for_change=false) const;
+    BC_API secret_parameter generate_secret(
+        size_t n, bool for_change=false) const;
 
 private:
     hash_digest get_sequence(size_t n, bool for_change) const;

@@ -29,7 +29,7 @@ AX_BOOST_BASE
 
 PKG_PROG_PKG_CONFIG
 
-AM_CXXFLAGS="-ggdb -g3 -Wall -Wno-missing-braces -pedantic -Wextra -fstack-protector-all -DDEBUG"
+AM_CXXFLAGS="-ggdb -g3 -Wall -Wno-missing-braces -pedantic -Wextra -fstack-protector-all -DDEBUG -fvisibility=internal -fvisibility-inlines-hidden"
 AC_SUBST([AM_CXXFLAGS])
 
 PKG_CHECK_MODULES([libbitcoin], [libbitcoin])

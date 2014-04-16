@@ -38,7 +38,8 @@ using namespace libbitcoin;
  *      // Error...
  * @endcode
  */
-std::string secret_to_wif(const secret_parameter& secret, bool compressed=true);
+BC_API std::string secret_to_wif(
+    const secret_parameter& secret, bool compressed=true);
 
 /**
  * Convert wallet import format key to secret parameter.
@@ -51,7 +52,7 @@ std::string secret_to_wif(const secret_parameter& secret, bool compressed=true);
  *      // Error...
  * @endcode
  */
-secret_parameter wif_to_secret(const std::string& wif);
+BC_API secret_parameter wif_to_secret(const std::string& wif);
 
 /**
  * Checks to see if a wif refers to a compressed public key.
@@ -65,7 +66,7 @@ secret_parameter wif_to_secret(const std::string& wif);
  *      // Wif is not compressed
  * @endcode
  */
-bool is_wif_compressed(const std::string& wif);
+BC_API bool is_wif_compressed(const std::string& wif);
 
 /**
  * Convert Cascasius minikey to secret parameter.
@@ -78,7 +79,7 @@ bool is_wif_compressed(const std::string& wif);
  *      // Error...
  * @endcode
  */
-secret_parameter minikey_to_secret(const std::string& minikey);
+BC_API secret_parameter minikey_to_secret(const std::string& minikey);
 
 } // libwallet
 
