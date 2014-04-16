@@ -29,14 +29,14 @@
 // BCW_INTERNAL is used for non-api symbols.
 
 #if defined BCW_STATIC
-#define BCW_API
-#define BCW_INTERNAL
+    #define BCW_API
+    #define BCW_INTERNAL
 #elif defined BCW_DLL
-#define BCW_API      BC_HELPER_DLL_EXPORT
-#define BCW_INTERNAL BC_HELPER_DLL_LOCAL
+    #define BCW_API      BC_HELPER_DLL_EXPORT
+    #define BCW_INTERNAL BC_HELPER_DLL_LOCAL
 #else
-#define BCW_API      BC_HELPER_DLL_IMPORT
-#define BCW_INTERNAL BC_HELPER_DLL_LOCAL
+    #define BCW_API      BC_HELPER_DLL_IMPORT
+    #define BCW_INTERNAL BC_HELPER_DLL_LOCAL
 #endif
 
 #endif
