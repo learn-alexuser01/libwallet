@@ -22,14 +22,14 @@
 
 #include <string>
 #include <vector>
-#include <bitcoin/define.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 
 typedef std::vector<std::string> string_list;
 
-BC_API string_list encode_mnemonic(const std::string& seed);
-BC_API const std::string decode_mnemonic(const string_list& words);
+WALLET_API string_list encode_mnemonic(const std::string& seed);
+WALLET_API const std::string decode_mnemonic(const string_list& words);
 
 } // libwallet
 

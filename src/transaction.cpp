@@ -16,13 +16,14 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/transaction.hpp>
 
 #include <bitcoin/utility/assert.hpp>
 
 namespace libwallet {
 
-select_outputs_result select_outputs(
+WALLET_API select_outputs_result select_outputs(
     output_info_list unspent, uint64_t min_value,
     select_outputs_algorithm alg)
 {

@@ -139,9 +139,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\..\examples\determ.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugDEXE|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\examples\hd.cpp">
       <ExcludedFromBuild>true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='DebugDEXE|Win32'">false</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\..\..\examples\uri.cpp">
       <ExcludedFromBuild>false</ExcludedFromBuild>

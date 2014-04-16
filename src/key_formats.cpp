@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/key_formats.hpp>
 
 #include <bitcoin/format.hpp>
@@ -27,7 +28,7 @@ namespace libwallet {
 
 typedef data_chunk private_data;
 
-std::string secret_to_wif(const secret_parameter& secret, bool compressed)
+WALLET_API std::string secret_to_wif(const secret_parameter& secret, bool compressed)
 {
     private_data unencoded_data(secret.begin(), secret.end());
     unencoded_data.insert(unencoded_data.begin(), payment_address::wif_version);
@@ -39,7 +40,7 @@ std::string secret_to_wif(const secret_parameter& secret, bool compressed)
     return encode_base58(unencoded_data);
 }
 
-secret_parameter wif_to_secret(const std::string& wif)
+WALLET_API secret_parameter wif_to_secret(const std::string& wif)
 {
     private_data decoded = decode_base58(wif);
     // 1 marker, 32 byte secret, optional 1 compressed flag, 4 checksum bytes
@@ -67,7 +68,7 @@ secret_parameter wif_to_secret(const std::string& wif)
     return secret;
 }
 
-bool is_wif_compressed(const std::string& wif) {
+WALLET_API bool is_wif_compressed(const std::string& wif) {
     data_chunk decoded = decode_base58(wif);
     if (decoded.size() == 1 + sha256_digest_size + 1 + 4 &&
         decoded[33] == (uint8_t)0x01)
@@ -94,7 +95,7 @@ bool check_minikey(const std::string& minikey)
     return single_sha256(minikey + "?")[0] == 0x00;
 }
 
-secret_parameter minikey_to_secret(const std::string& minikey)
+WALLET_API secret_parameter minikey_to_secret(const std::string& minikey)
 {
     if (!check_minikey(minikey))
         return secret_parameter();

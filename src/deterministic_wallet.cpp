@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/deterministic_wallet.hpp>
 
 #include <boost/lexical_cast.hpp>
@@ -92,7 +93,7 @@ const data_chunk bignum_data(BIGNUM* bn)
     return result;
 }
 
-void deterministic_wallet::new_seed()
+WALLET_API void deterministic_wallet::new_seed()
 {
     constexpr size_t bits_needed = 8 * seed_size / 2;
     ssl_bignum rand_value;
@@ -127,7 +128,7 @@ data_chunk pubkey_from_secret(const secret_parameter& secret)
     return privkey.public_key();
 }
 
-bool deterministic_wallet::set_seed(std::string seed)
+WALLET_API bool deterministic_wallet::set_seed(std::string seed)
 {
     // Trim spaces and newlines around the string.
     boost::algorithm::trim(seed);
@@ -142,22 +143,22 @@ bool deterministic_wallet::set_seed(std::string seed)
         return false;
     return true;
 }
-const std::string& deterministic_wallet::seed() const
+WALLET_API const std::string& deterministic_wallet::seed() const
 {
     return seed_;
 }
 
-bool deterministic_wallet::set_master_public_key(const data_chunk& mpk)
+WALLET_API bool deterministic_wallet::set_master_public_key(const data_chunk& mpk)
 {
     master_public_key_ = mpk;
     return true;
 }
-const data_chunk& deterministic_wallet::master_public_key() const
+WALLET_API const data_chunk& deterministic_wallet::master_public_key() const
 {
     return master_public_key_;
 }
 
-data_chunk deterministic_wallet::generate_public_key(
+WALLET_API data_chunk deterministic_wallet::generate_public_key(
     size_t n, bool for_change) const
 {
     hash_digest sequence = get_sequence(n, for_change);
@@ -188,7 +189,7 @@ data_chunk deterministic_wallet::generate_public_key(
     return raw_pubkey;
 }
 
-secret_parameter deterministic_wallet::generate_secret(
+WALLET_API secret_parameter deterministic_wallet::generate_secret(
     size_t n, bool for_change) const
 {
     if (seed_.empty())
