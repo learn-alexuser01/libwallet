@@ -19,9 +19,9 @@
 #ifndef LIBWALLET_DETERMINISTIC_WALLET_HPP
 #define LIBWALLET_DETERMINISTIC_WALLET_HPP
 
-#include <bitcoin/define.hpp>
 #include <bitcoin/types.hpp>
 #include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 

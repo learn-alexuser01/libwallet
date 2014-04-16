@@ -19,8 +19,8 @@
 #ifndef LIBWALLET_TRANSACTION_HPP
 #define LIBWALLET_TRANSACTION_HPP
 
-#include <bitcoin/define.hpp>
 #include <bitcoin/transaction.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 

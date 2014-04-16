@@ -20,8 +20,8 @@
 #define LIBWALLET_KEY_FORMATS_HPP
 
 #include <string>
-
 #include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 

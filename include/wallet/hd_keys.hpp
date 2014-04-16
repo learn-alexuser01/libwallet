@@ -19,9 +19,9 @@
 #ifndef LIBWALLET_HD_KEYS_HPP
 #define LIBWALLET_HD_KEYS_HPP
 
-#include <bitcoin/define.hpp>
 #include <bitcoin/address.hpp>
 #include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <wallet/define.hpp>
 
 namespace libwallet {
 
