@@ -50,10 +50,11 @@ static bool isnt_amp(const char c)
 
 static unsigned from_hex(const char c)
 {
-    return
-        'A' <= c && c <= 'F' ? 10 + c - 'A' :
-        'a' <= c && c <= 'f' ? 10 + c - 'a' :
-        c - '0';
+    if ('A' <= c && c <= 'F')
+        return 10 + c - 'A';
+    if ('a' <= c && c <= 'f')
+        return 10 + c - 'a';
+    return c - '0';
 }
 
 /**
@@ -69,14 +70,22 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(const char))
         ('%' == *i && 2 < end - i && is_hex(i[1]) && is_hex(i[2]))))
     {
         ++count;
-        i += ('%' == *i ? 3 : 1);
+        if ('%' == *i)
+            i += 3;
+        else
+            ++i;
     }
     std::string out;
     out.reserve(count);
     while (j != i)
     {
-        out.push_back('%' == *j ? from_hex(j[1]) << 4 | from_hex(j[2]) : *j);
-        j += ('%' == *j ? 3 : 1);
+        if ('%' == *j)
+        {
+            out.push_back(from_hex(j[1]) << 4 | from_hex(j[2]));
+            j += 3;
+        }
+        else
+            out.push_back(*j++);
     }
     return out;
 }
@@ -121,7 +130,10 @@ BCW_API bool uri_parse(const std::string& uri, uri_visitor& result,
             ++i; // Consume '='
             if (key.empty())
                 return false;
-            value = unescape(i, uri.end(), strict ? is_qchar : isnt_amp);
+            if (strict)
+                value = unescape(i, uri.end(), is_qchar);
+            else
+                value = unescape(i, uri.end(), isnt_amp);
         }
         if (uri.end() != i && '&' != *i)
             return false;
@@ -190,7 +202,9 @@ BCW_API uint64_t parse_amount(const std::string& amount,
         value *= 10;
         ++places;
     }
-    return amount.end() == i ? value : invalid_amount;
+    if (amount.end() != i)
+        return invalid_amount;
+    return value;
 }
 
 /**
@@ -260,9 +274,12 @@ BCW_API void uri_writer::write_address(const std::string& address)
 BCW_API void uri_writer::write_param(const std::string& key, 
     const std::string& value)
 {
-    stream_ << (first_param_ ? '?' : '&') <<
-        escape(key, is_qchar) << '=' << escape(value, is_qchar);
+    if (first_param_)
+        stream_ << '?';
+    else
+        stream_ << '&';
     first_param_ = false;
+    stream_ << escape(key, is_qchar) << '=' << escape(value, is_qchar);
 }
 
 BCW_API std::string uri_writer::string() const

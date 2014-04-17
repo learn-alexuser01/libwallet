@@ -149,9 +149,11 @@ BCW_API std::string hd_public_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
+    auto prefix = mainnet_public_prefix;
+    if (lineage_.testnet)
+        prefix = testnet_public_prefix;
 
-    extend_data(data, ser32(lineage_.testnet ? testnet_public_prefix :
-        mainnet_public_prefix));
+    extend_data(data, ser32(prefix));
     data.push_back(lineage_.depth);
     extend_data(data, lineage_.parent_fingerprint);
     extend_data(data, ser32(lineage_.child_number));
@@ -275,9 +277,11 @@ BCW_API std::string hd_private_key::serialize() const
 {
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
+    auto prefix = mainnet_private_prefix;
+    if (lineage_.testnet)
+        prefix = testnet_private_prefix;
 
-    extend_data(data, ser32(lineage_.testnet ? testnet_private_prefix :
-        mainnet_private_prefix));
+    extend_data(data, ser32(prefix));
     data.push_back(lineage_.depth);
     extend_data(data, lineage_.parent_fingerprint);
     extend_data(data, ser32(lineage_.child_number));
