@@ -62,7 +62,7 @@ public:
     BCW_API ser32_type fingerprint() const;
     BCW_API payment_address address() const;
 
-    BCW_API hd_public_key generate_public_key(uint32_t i);
+    BCW_API hd_public_key generate_public_key(uint32_t i) const;
 
 protected:
     bool valid_;
@@ -86,8 +86,8 @@ public:
     BCW_API const secret_parameter& private_key() const;
     BCW_API std::string serialize() const;
 
-    BCW_API hd_private_key generate_private_key(uint32_t i);
-    BCW_API hd_public_key generate_public_key(uint32_t i);
+    BCW_API hd_private_key generate_private_key(uint32_t i) const;
+    BCW_API hd_public_key generate_public_key(uint32_t i) const;
 
 protected:
     secret_parameter k_;

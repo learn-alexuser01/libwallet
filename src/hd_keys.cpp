@@ -175,7 +175,7 @@ BCW_API payment_address hd_public_key::address() const
     return address;
 }
 
-BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i) const
 {
     if (!valid_)
         return hd_private_key();
@@ -289,7 +289,7 @@ BCW_API std::string hd_private_key::serialize() const
     return encode_base58(data);
 }
 
-BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
+BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i) const
 {
     if (!valid_)
         return hd_private_key();
@@ -346,7 +346,7 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
     return hd_private_key(out, I.R, lineage);
 }
 
-BCW_API hd_public_key hd_private_key::generate_public_key(uint32_t i)
+BCW_API hd_public_key hd_private_key::generate_public_key(uint32_t i) const
 {
     return generate_private_key(i);
 }
