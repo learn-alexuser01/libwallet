@@ -23,11 +23,11 @@
 #include <boost/algorithm/string.hpp>
 #include <openssl/ec.h>
 #include <openssl/obj_mac.h>
-#include <openssl/sha.h>
 #include <bitcoin/constants.hpp>
 #include <bitcoin/format.hpp>
 #include <bitcoin/utility/assert.hpp>
-#include <bitcoin/utility/sha256.hpp>
+#include <bitcoin/utility/hash.hpp>
+#include <bitcoin/utility/external/sha256.h>
 
 namespace libwallet {
 
@@ -110,11 +110,11 @@ secret_parameter stretch_seed(const std::string& seed)
     secret_parameter oldseed = stretched;
     for (size_t i = 0; i < 100000; ++i)
     {
-        SHA256_CTX ctx;
-        SHA256_Init(&ctx);
-        SHA256_Update(&ctx, stretched.data(), stretched.size());
-        SHA256_Update(&ctx, oldseed.data(), oldseed.size());
-        SHA256_Final(stretched.data(), &ctx);
+        SHA256CTX ctx;
+        SHA256Init(&ctx);
+        SHA256Update(&ctx, stretched.data(), stretched.size());
+        SHA256Update(&ctx, oldseed.data(), oldseed.size());
+        SHA256Final(&ctx, stretched.data());
     }
     return stretched;
 }
@@ -232,7 +232,7 @@ hash_digest deterministic_wallet::get_sequence(
     chunk.push_back(for_change ? '1' : '0');
     chunk.push_back(':');
     extend_data(chunk, master_public_key_);
-    hash_digest result = generate_sha256_hash(chunk);
+    hash_digest result = generate_hash(chunk);
     std::reverse(result.begin(), result.end());
     return result;
 }
