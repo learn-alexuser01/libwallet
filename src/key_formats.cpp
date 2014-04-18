@@ -16,36 +16,36 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-#include <wallet/define.hpp>
 #include <wallet/key_formats.hpp>
 
 #include <bitcoin/format.hpp>
 #include <bitcoin/utility/base58.hpp>
-#include <bitcoin/utility/sha256.hpp>
+#include <bitcoin/utility/hash.hpp>
 #include <bitcoin/address.hpp>
+#include <bitcoin/utility/external/sha256.h>
 
 namespace libwallet {
 
 typedef data_chunk private_data;
 
-BCW_API std::string secret_to_wif(const secret_parameter& secret, bool compressed)
+std::string secret_to_wif(const secret_parameter& secret, bool compressed)
 {
     private_data unencoded_data(secret.begin(), secret.end());
     unencoded_data.insert(unencoded_data.begin(), payment_address::wif_version);
     if (compressed)
         extend_data(unencoded_data, uncast_type<uint8_t>(0x01));
 
-    uint32_t checksum = generate_sha256_checksum(unencoded_data);
+    uint32_t checksum = generate_checksum(unencoded_data);
     extend_data(unencoded_data, uncast_type(checksum));
     return encode_base58(unencoded_data);
 }
 
-BCW_API secret_parameter wif_to_secret(const std::string& wif)
+secret_parameter wif_to_secret(const std::string& wif)
 {
     private_data decoded = decode_base58(wif);
     // 1 marker, 32 byte secret, optional 1 compressed flag, 4 checksum bytes
-    if (decoded.size() != 1 + sha256_digest_size + 4 && 
-        decoded.size() != 1 + sha256_digest_size + 1 + 4)
+    if (decoded.size() != 1 + hash_digest_size + 4 && 
+        decoded.size() != 1 + hash_digest_size + 1 + 4)
         return secret_parameter();
     // Check first byte is valid and remove it
     if (decoded[0] != payment_address::wif_version)
@@ -54,8 +54,7 @@ BCW_API secret_parameter wif_to_secret(const std::string& wif)
     private_data checksum_bytes(decoded.end() - 4, decoded.end());
     BITCOIN_ASSERT(checksum_bytes.size() == 4);
     decoded.erase(decoded.end() - 4, decoded.end());
-    if (cast_chunk<uint32_t>(checksum_bytes) !=
-            generate_sha256_checksum(decoded))
+    if (cast_chunk<uint32_t>(checksum_bytes) != generate_checksum(decoded))
         return secret_parameter();
     // Checks passed. Drop the 0x80 start byte.
     decoded.erase(decoded.begin());
@@ -68,9 +67,9 @@ BCW_API secret_parameter wif_to_secret(const std::string& wif)
     return secret;
 }
 
-BCW_API bool is_wif_compressed(const std::string& wif) {
+bool is_wif_compressed(const std::string& wif) {
     data_chunk decoded = decode_base58(wif);
-    if (decoded.size() == 1 + sha256_digest_size + 1 + 4 &&
+    if (decoded.size() == 1 + hash_digest_size + 1 + 4 &&
         decoded[33] == (uint8_t)0x01)
         return true;
     else
@@ -79,11 +78,10 @@ BCW_API bool is_wif_compressed(const std::string& wif) {
 
 hash_digest single_sha256(const std::string& mini)
 {
-    SHA256_CTX ctx;
     hash_digest digest;
-    SHA256_Init(&ctx);
-    SHA256_Update(&ctx, mini.c_str(), mini.size());
-    SHA256_Final(digest.data(), &ctx);
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(mini.c_str());
+    SHA256__(data, static_cast<uint32_t>(mini.size()),
+        digest.data());
     return digest;
 }
 
@@ -95,7 +93,7 @@ bool check_minikey(const std::string& minikey)
     return single_sha256(minikey + "?")[0] == 0x00;
 }
 
-BCW_API secret_parameter minikey_to_secret(const std::string& minikey)
+secret_parameter minikey_to_secret(const std::string& minikey)
 {
     if (!check_minikey(minikey))
         return secret_parameter();

@@ -24,8 +24,7 @@
 #include <openssl/hmac.h>
 #include <bitcoin/format.hpp>
 #include <bitcoin/utility/base58.hpp>
-#include <bitcoin/utility/ripemd.hpp>
-#include <bitcoin/utility/sha256.hpp>
+#include <bitcoin/utility/hash.hpp>
 
 namespace libwallet {
 
@@ -143,13 +142,13 @@ BCW_API std::string hd_public_key::serialize() const
     extend_data(data, c_);
     extend_data(data, K_);
 
-    extend_data(data, uncast_type(generate_sha256_checksum(data)));
+    extend_data(data, uncast_type(generate_checksum(data)));
     return encode_base58(data);
 }
 
 BCW_API ser32_type hd_public_key::fingerprint() const
 {
-    short_hash md = generate_ripemd_hash(K_);
+    short_hash md = generate_short_hash(K_);
     return ser32_type{{md[0], md[1], md[2], md[3]}};
 }
 
@@ -255,7 +254,7 @@ BCW_API std::string hd_private_key::serialize() const
     data.push_back(0x00);
     extend_data(data, k_);
 
-    extend_data(data, uncast_type(generate_sha256_checksum(data)));
+    extend_data(data, uncast_type(generate_checksum(data)));
     return encode_base58(data);
 }
 
