@@ -98,7 +98,7 @@ struct split_long_hash
     half_long_hash right;
 };
 
-static split_long_hash split(long_hash& hmac)
+static split_long_hash split(const long_hash& hmac)
 {
     split_long_hash split;
 
@@ -111,8 +111,8 @@ static split_long_hash split(long_hash& hmac)
     return split;
 }
 
-static long_hash hmac_sha512(
-    const uint8_t* key, size_t key_length, const data_chunk& data)
+static long_hash hmac_sha512(const uint8_t* key, size_t key_length,
+    const data_chunk& data)
 {
     // TODO: determine if this should be key_data(key, key + key_length - 1) 
     data_chunk key_data(key, key + key_length);
