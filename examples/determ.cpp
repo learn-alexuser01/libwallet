@@ -42,11 +42,15 @@ int main()
     // Extract the secret parameter.
     secret_parameter secret = wallet.generate_secret(2);
     assert(encode_hex(secret) == "33cc7e35fbb78d17d207e53d0fe950d1db571be889b3ff87aec653e501759264");
+
     // The secret parameter is used to compute the private key
-    // by the elliptic curve formula. Set compressed to false, this is testing the electrum-style deterministic wallet
+    // by the elliptic curve formula. Set compressed to false, 
+    // this is testing the electrum-style deterministic wallet
     elliptic_curve_key privkey;
-    if (!privkey.set_secret(secret, false))
+    privkey.set_compressed(false);
+    if (!privkey.set_secret(secret))
         log_error() << "Error set private key.";
+
     // Wallet generated public key should match corresponding public key
     // in the private key.
     assert(privkey.public_key() == pubkey);
@@ -59,6 +63,7 @@ int main()
     deterministic_wallet wallet2;
     wallet2.set_master_public_key(mpk);
     assert(wallet2.generate_public_key(2) == pubkey);
+
     // Trying to generate the secret parameter will always return null_hash.
     assert(wallet2.generate_secret(2) == null_hash);
     return 0;

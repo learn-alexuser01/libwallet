@@ -173,7 +173,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\include\wallet\define.hpp" />
-    <ClInclude Include="..\..\..\..\include\wallet\deterministic_wallet.hpp" />
+    <ClInclude Include="..\..\..\..\include\wallet\electrum_keys.hpp" />
     <ClInclude Include="..\..\..\..\include\wallet\hd_keys.hpp" />
     <ClInclude Include="..\..\..\..\include\wallet\key_formats.hpp" />
     <ClInclude Include="..\..\..\..\include\wallet\mnemonic.hpp" />
@@ -182,7 +182,7 @@
     <ClInclude Include="..\..\..\..\include\wallet\wallet.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\src\deterministic_wallet.cpp" />
+    <ClCompile Include="..\..\..\..\src\electrum_keys.cpp" />
     <ClCompile Include="..\..\..\..\src\hd_keys.cpp" />
     <ClCompile Include="..\..\..\..\src\key_formats.cpp" />
     <ClCompile Include="..\..\..\..\src\mnemonic.cpp" />
