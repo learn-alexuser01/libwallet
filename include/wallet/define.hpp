@@ -39,5 +39,11 @@
     #define BCW_INTERNAL BC_HELPER_DLL_LOCAL
 #endif
 
+// Work in progress, to be removed. 
+#define USE_OPENSSL_BN
+#define USE_OPENSSL_EC
+//#define USE_OPENSSL_HM
+#define NID_secp256k1 714
+
 #endif
 

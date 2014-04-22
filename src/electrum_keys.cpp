@@ -17,17 +17,18 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 #include <wallet/define.hpp>
-#include <wallet/deterministic_wallet.hpp>
+#include <wallet/electrum_keys.hpp>
+
+#ifdef USE_OPENSSL_EC
+#include <openssl/ec.h>
+#endif
+#ifdef USE_OPENSSL_HM
+#include <openssl/hmac.h>
+#endif
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
-#include <openssl/ec.h>
-#include <openssl/obj_mac.h>
-#include <bitcoin/constants.hpp>
-#include <bitcoin/format.hpp>
-#include <bitcoin/utility/assert.hpp>
-#include <bitcoin/utility/hash.hpp>
-#include <bitcoin/utility/external/sha256.h>
+#include <bitcoin/bitcoin.hpp>
 
 namespace libwallet {
 
@@ -70,9 +71,11 @@ struct ssl_bignum
         } \
     };
 
+// ****************************************************************************
 SSL_TYPE(ec_group, EC_GROUP, EC_GROUP_free)
 SSL_TYPE(ec_point, EC_POINT, EC_POINT_free)
 SSL_TYPE(bn_ctx, BN_CTX, BN_CTX_free)
+// ****************************************************************************
 
 const std::string bignum_hex(BIGNUM* bn)
 {
@@ -105,27 +108,32 @@ BCW_API void deterministic_wallet::new_seed()
 secret_parameter stretch_seed(const std::string& seed)
 {
     BITCOIN_ASSERT(seed.size() == deterministic_wallet::seed_size);
-    secret_parameter stretched;
-    std::copy(seed.begin(), seed.end(), stretched.begin());
-    secret_parameter oldseed = stretched;
-    for (size_t i = 0; i < 100000; ++i)
+
+    constexpr size_t electrum_magic_number = 100000;
+
+    // This assumes that seed_size == hash_digest size.
+    secret_parameter secret;
+    data_chunk stretched = data_chunk(seed.begin(), seed.end());
+    data_chunk oldseed = stretched;
+
+    for (size_t i = 0; i < electrum_magic_number; ++i)
     {
-        SHA256CTX ctx;
-        SHA256Init(&ctx);
-        SHA256Update(&ctx, stretched.data(), stretched.size());
-        SHA256Update(&ctx, oldseed.data(), oldseed.size());
-        SHA256Final(&ctx, stretched.data());
+        // There are inefficiencies in using this generalized function.
+        // This could be optimized by writing directly back into stretched. 
+        secret = sha256_hash(stretched, oldseed);
+        std::copy(secret.begin(), secret.end(), stretched.begin());
     }
-    return stretched;
+
+    return secret;
 }
 
 data_chunk pubkey_from_secret(const secret_parameter& secret)
 {
+    // Disable compression for this key (legacy electrum)
     elliptic_curve_key privkey;
-    // Disable compression for this key (legacy electrum.)
-    if (!privkey.set_secret(secret, false))
-        return data_chunk();
-    return privkey.public_key();
+    privkey.set_compressed(false);
+    return privkey.set_secret(secret) ? privkey.public_key() :
+        data_chunk();
 }
 
 BCW_API bool deterministic_wallet::set_seed(std::string seed)
@@ -137,11 +145,10 @@ BCW_API bool deterministic_wallet::set_seed(std::string seed)
     seed_ = seed;
     stretched_seed_ = stretch_seed(seed);
     master_public_key_ = pubkey_from_secret(stretched_seed_);
+
     // Snip the beginning 04 byte for compat reasons.
     master_public_key_.erase(master_public_key_.begin());
-    if (master_public_key_.empty())
-        return false;
-    return true;
+    return !master_public_key_.empty();
 }
 BCW_API const std::string& deterministic_wallet::seed() const
 {
@@ -168,6 +175,7 @@ BCW_API data_chunk deterministic_wallet::generate_public_key(
     BN_bin2bn(master_public_key_.data(), 32, x);
     BN_bin2bn(master_public_key_.data() + 32, 32, y);
 
+    // ************************************************************************
     // Create a point.
     ec_group group(EC_GROUP_new_by_curve_name(NID_secp256k1));
     ec_point mpk(EC_POINT_new(group));
@@ -182,6 +190,8 @@ BCW_API data_chunk deterministic_wallet::generate_public_key(
 
     // Create the actual public key.
     EC_POINT_get_affine_coordinates_GFp(group, result, x, y, ctx);
+    // ************************************************************************
+
     // 04 + x + y
     data_chunk raw_pubkey{0x04};
     extend_data(raw_pubkey, bignum_data(x));
@@ -199,10 +209,12 @@ BCW_API secret_parameter deterministic_wallet::generate_secret(
     hash_digest sequence = get_sequence(n, for_change);
     BN_bin2bn(sequence.data(), (int)sequence.size(), z);
 
+    // ************************************************************************
     ec_group group(EC_GROUP_new_by_curve_name(NID_secp256k1));
     ssl_bignum order;
     bn_ctx ctx(BN_CTX_new());
     EC_GROUP_get_order(group, order, ctx);
+    // ************************************************************************
 
     // secexp = (stretched_seed + z) % order
     ssl_bignum secexp;
@@ -214,17 +226,18 @@ BCW_API secret_parameter deterministic_wallet::generate_secret(
     int secexp_bytes_size = BN_num_bytes(secexp);
     BITCOIN_ASSERT(secexp_bytes_size >= 0 &&
         static_cast<size_t>(BN_num_bytes(secexp)) <= secret.size());
+
     // If bignum value begins with 0x00, then
     // SSL will skip to the first significant digit.
     size_t copy_offset = secret.size() - BN_num_bytes(secexp);
     BN_bn2bin(secexp, secret.data() + copy_offset);
+
     // Zero out beginning 0x00 bytes (if they exist).
     std::fill(secret.begin(), secret.begin() + copy_offset, 0x00);
     return secret;
 }
 
-hash_digest deterministic_wallet::get_sequence(
-    size_t n, bool for_change) const
+hash_digest deterministic_wallet::get_sequence(size_t n, bool for_change) const
 {
     data_chunk chunk;
     extend_data(chunk, std::to_string(n));
@@ -232,7 +245,7 @@ hash_digest deterministic_wallet::get_sequence(
     chunk.push_back(for_change ? '1' : '0');
     chunk.push_back(':');
     extend_data(chunk, master_public_key_);
-    hash_digest result = generate_hash(chunk);
+    hash_digest result = bitcoin_hash(chunk);
     std::reverse(result.begin(), result.end());
     return result;
 }

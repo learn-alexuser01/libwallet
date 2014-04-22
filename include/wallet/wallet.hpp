@@ -21,7 +21,7 @@
 
 // Convenience header that includes everything
 // Not to be used internally. For API users.
-#include <wallet/deterministic_wallet.hpp>
+#include <wallet/electrum_keys.hpp>
 #include <wallet/mnemonic.hpp>
 #include <wallet/hd_keys.hpp>
 #include <wallet/key_formats.hpp>

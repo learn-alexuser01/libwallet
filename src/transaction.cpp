@@ -19,7 +19,7 @@
 #include <wallet/define.hpp>
 #include <wallet/transaction.hpp>
 
-#include <bitcoin/utility/assert.hpp>
+#include <bitcoin/bitcoin.hpp>
 
 namespace libwallet {
 

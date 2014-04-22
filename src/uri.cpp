@@ -21,8 +21,7 @@
 #include <wallet/uri.hpp>
 
 #include <boost/algorithm/string.hpp>
-#include <bitcoin/constants.hpp>
-#include <bitcoin/utility/base58.hpp>
+#include <bitcoin/bitcoin.hpp>
 
 namespace libwallet {
 
@@ -89,7 +88,8 @@ static std::string unescape(sci& i, sci end, bool (*is_valid)(const char))
  * false allows these malformed URI's to parse anyhow.
  * @return false if the URI is malformed.
  */
-BCW_API bool uri_parse(const std::string& uri, uri_visitor& result, bool strict)
+BCW_API bool uri_parse(const std::string& uri, uri_visitor& result, 
+    bool strict)
 {
     auto i = uri.begin();
 
@@ -160,7 +160,8 @@ BCW_API bool uri_parse_result::got_param(std::string& key, std::string& value)
     return true;
 }
 
-BCW_API uint64_t parse_amount(const std::string& amount, unsigned decmial_place)
+BCW_API uint64_t parse_amount(const std::string& amount, 
+    unsigned decmial_place)
 {
     auto i = amount.begin();
     uint64_t value = 0;
@@ -216,7 +217,8 @@ BCW_API uri_writer::uri_writer()
     stream_ << "bitcoin:";
 }
 
-BCW_API void uri_writer::write_address(const libbitcoin::payment_address& address)
+BCW_API void uri_writer::write_address(
+    const libbitcoin::payment_address& address)
 {
     write_address(address.encoded());
 }
@@ -255,7 +257,8 @@ BCW_API void uri_writer::write_address(const std::string& address)
     stream_ << address;
 }
 
-BCW_API void uri_writer::write_param(const std::string& key, const std::string& value)
+BCW_API void uri_writer::write_param(const std::string& key, 
+    const std::string& value)
 {
     stream_ << (first_param_ ? '?' : '&') <<
         escape(key, is_qchar) << '=' << escape(value, is_qchar);

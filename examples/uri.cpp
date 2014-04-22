@@ -57,8 +57,8 @@ int main()
     success = libwallet::uri_parse(
         "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?amount=0.1", result);
     BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address &&
-        result.address.get().encoded() == "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
+    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
+        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
     BITCOIN_ASSERT(result.amount && result.amount.get() == 10000000);
     BITCOIN_ASSERT(!result.label);
     BITCOIN_ASSERT(!result.message);
@@ -83,8 +83,8 @@ int main()
     success = libwallet::uri_parse(
         "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD", result);
     BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address &&
-        result.address.get().encoded() == "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
+    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
+        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
     BITCOIN_ASSERT(!result.amount);
     BITCOIN_ASSERT(!result.label);
     BITCOIN_ASSERT(!result.message);
@@ -95,8 +95,8 @@ int main()
     success = libwallet::uri_parse(
         "bitcoin:%3113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD", result);
     BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address &&
-        result.address.get().encoded() == "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
+    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
+        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
 
     // Malformed addresses:
     BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:19l88", result));
@@ -209,8 +209,8 @@ int main()
 
     // Number parser:
     BITCOIN_ASSERT(libwallet::parse_amount("4.432") == 443200000);
-    BITCOIN_ASSERT(
-        libwallet::parse_amount("4.432.") == libwallet::invalid_amount);
+    BITCOIN_ASSERT(libwallet::parse_amount("4.432.") == 
+        libwallet::invalid_amount);
     BITCOIN_ASSERT(libwallet::parse_amount("4")  == 400000000);
     BITCOIN_ASSERT(libwallet::parse_amount("4.") == 400000000);
     BITCOIN_ASSERT(libwallet::parse_amount(".4") == 40000000);
@@ -231,6 +231,7 @@ int main()
     writer.write_label("&=\n");
     writer.write_message("hello bitcoin");
     writer.write_r("http://example.com?purchase=shoes&user=bob");
+
     BITCOIN_ASSERT(writer.string() ==
         "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?"
         "amount=0.0012&amount=100&"

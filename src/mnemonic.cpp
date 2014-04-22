@@ -26,12 +26,12 @@
 #endif
 #include <algorithm>
 #include <sstream>
-#include <bitcoin/utility/assert.hpp>
+#include <bitcoin/bitcoin.hpp>
 
 namespace libwallet {
 
 // List of words from:
-//   http://en.wiktionary.org/wiki/Wiktionary:Frequency_lists/Contemporary_poetry
+// http://en.wiktionary.org/wiki/Wiktionary:Frequency_lists/Contemporary_poetry
 
 string_list common_words{
 "like",

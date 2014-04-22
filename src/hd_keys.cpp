@@ -19,12 +19,18 @@
 #include <wallet/define.hpp>
 #include <wallet/hd_keys.hpp>
 
-#include <algorithm>
-#include <openssl/bn.h>
+#ifdef USE_OPENSSL_EC
+#include <openssl/ec.h>
+#endif
+#ifdef USE_OPENSSL_HM
 #include <openssl/hmac.h>
-#include <bitcoin/format.hpp>
-#include <bitcoin/utility/base58.hpp>
-#include <bitcoin/utility/hash.hpp>
+#endif
+#ifdef USE_OPENSSL_BN
+#include <openssl/bn.h>
+#endif
+
+#include <algorithm>
+#include <bitcoin/bitcoin.hpp>
 
 namespace libwallet {
 
@@ -46,46 +52,71 @@ public:
     }
     T* ptr;
 };
+
 typedef auto_free<BIGNUM, BN_free> ssl_bignum;
 typedef auto_free<BN_CTX, BN_CTX_free> ssl_bn_ctx;
+
+// ****************************************************************************
 typedef auto_free<EC_GROUP, EC_GROUP_free> ssl_ec_group;
 typedef auto_free<EC_POINT, EC_POINT_free> ssl_ec_point;
 
-constexpr uint32_t mainnet_private_prefix = 0x0488ADE4;
-constexpr uint32_t mainnet_public_prefix  = 0x0488B21E;
-constexpr uint32_t testnet_private_prefix = 0x04358394;
-constexpr uint32_t testnet_public_prefix  = 0x043587CF;
+secret_parameter secp256k1_n
+{
+    {
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
+        0xba, 0xae, 0xdc, 0xe6, 0xaf, 0x48, 0xa0, 0x3b,
+        0xbf, 0xd2, 0x5e, 0x8c, 0xd0, 0x36, 0x41, 0x41
+    }
+};
+// ****************************************************************************
 
-secret_parameter secp256k1_n{{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-                              0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xfe,
-                              0xba, 0xae, 0xdc, 0xe6, 0xaf, 0x48, 0xa0, 0x3b,
-                              0xbf, 0xd2, 0x5e, 0x8c, 0xd0, 0x36, 0x41, 0x41}};
+constexpr uint32_t mainnet_private_prefix = 0x0488ADE4;
+constexpr uint32_t mainnet_public_prefix = 0x0488B21E;
+constexpr uint32_t testnet_private_prefix = 0x04358394;
+constexpr uint32_t testnet_public_prefix = 0x043587CF;
 
 static data_chunk secret_to_public_key(const secret_parameter& secret)
 {
     elliptic_curve_key key;
-    key.set_secret(secret, true);
+    key.set_compressed(true);
+    key.set_secret(secret);
     return key.public_key();
 }
 
 /**
  * Corresponds to a split HMAC-SHA256 result, as used in BIP 32.
  */
-struct split_hmac
+
+// long_hash is used for hmac_sha512 in libbitcoin
+constexpr size_t half_hmac_sha512_size = long_hash_size / 2;
+typedef std::array<uint8_t, half_hmac_sha512_size> half_long_hash;
+
+struct split_long_hash
 {
-    std::array<uint8_t, 32> IL;
-    std::array<uint8_t, 32> IR;
+    half_long_hash left;
+    half_long_hash right;
 };
-static split_hmac hmac_sha512(
-    const void* key, int key_len, const data_chunk& data)
+
+static split_long_hash split(long_hash& hmac)
 {
-    std::array<uint8_t, 64> hmac;
-    HMAC(EVP_sha512(), key, key_len, data.data(), data.size(),
-        hmac.data(), nullptr);
-    split_hmac I;
-    std::copy(hmac.begin(), hmac.begin() + 32, I.IL.begin());
-    std::copy(hmac.begin() + 32, hmac.end(), I.IR.begin());
-    return I;
+    split_long_hash split;
+
+    std::copy(hmac.begin(), hmac.begin() + half_hmac_sha512_size,
+        split.left.begin());
+
+    std::copy(hmac.begin() + half_hmac_sha512_size, hmac.end(),
+        split.right.begin());
+
+    return split;
+}
+
+static long_hash hmac_sha512(
+    const uint8_t* key, size_t key_length, const data_chunk& data)
+{
+    // TODO: determine if this should be key_data(key, key + key_length - 1) 
+    data_chunk key_data(key, key + key_length);
+    return libbitcoin::hmac_sha512_hash(data, key_data);
 }
 
 static ser32_type ser32(uint32_t i)
@@ -134,22 +165,22 @@ BCW_API std::string hd_public_key::serialize() const
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
 
-    extend_data(data, ser32(lineage_.testnet ?
-        testnet_public_prefix : mainnet_public_prefix));
+    extend_data(data, ser32(lineage_.testnet ? testnet_public_prefix :
+        mainnet_public_prefix));
     data.push_back(lineage_.depth);
     extend_data(data, lineage_.parent_fingerprint);
     extend_data(data, ser32(lineage_.child_number));
     extend_data(data, c_);
     extend_data(data, K_);
 
-    extend_data(data, uncast_type(generate_checksum(data)));
+    extend_data(data, uncast_type(bitcoin_checksum(data)));
     return encode_base58(data);
 }
 
 BCW_API ser32_type hd_public_key::fingerprint() const
 {
-    short_hash md = generate_short_hash(K_);
-    return ser32_type{{md[0], md[1], md[2], md[3]}};
+    short_hash md = bitcoin_short_hash(K_);
+    return ser32_type{ { md[0], md[1], md[2], md[3] } };
 }
 
 BCW_API payment_address hd_public_key::address() const
@@ -170,21 +201,27 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
     data.reserve(33 + 4);
     extend_data(data, K_);
     extend_data(data, ser32(i));
-    auto I = hmac_sha512(c_.data(), (int)c_.size(), data);
+    auto I = split(hmac_sha512(c_.data(), (int)c_.size(), data));
 
-    //The returned child key Ki is point(parse256(IL)) + Kpar.
+    // ************************************************************************
+    // The returned child key Ki is point(parse256(IL)) + Kpar.
     ssl_ec_group group = EC_GROUP_new_by_curve_name(NID_secp256k1);
+
     if (!group)
         return hd_public_key();
+
     ssl_bn_ctx ctx = BN_CTX_new();
     ssl_ec_point Ki = EC_POINT_new(group);
     ssl_ec_point Kpar = EC_POINT_new(group);
     ssl_ec_point IL = EC_POINT_new(group);
-    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(
-        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
+
+    ssl_bignum il = BN_bin2bn(I.left.data(), (int)I.left.size(), nullptr);
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(), 
+        nullptr);
+
     if (!ctx || !Ki || !Kpar || !IL || !il || !n)
         return hd_public_key();
+
     if (!EC_POINT_oct2point(group, Kpar, K_.data(), K_.size(), ctx))
         return hd_public_key();
     if (!EC_POINT_mul(group, IL, il, nullptr, nullptr, ctx))
@@ -196,15 +233,19 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i)
     if (0 <= BN_cmp(il, n) || EC_POINT_is_at_infinity(group, Ki))
         return hd_private_key();
 
-    size_t Ki_size = EC_POINT_point2oct(group, Ki,
-        POINT_CONVERSION_COMPRESSED, NULL, 0, ctx);
-    data_chunk out(Ki_size);
-    if (!EC_POINT_point2oct(group, Ki,
-        POINT_CONVERSION_COMPRESSED, out.data(), out.size(), ctx))
-        return hd_public_key();
+    size_t Ki_size = EC_POINT_point2oct(group, Ki, POINT_CONVERSION_COMPRESSED,
+        NULL, 0, ctx);
 
-    return hd_public_key(out, I.IR, hd_key_lineage{lineage_.testnet,
-        static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
+    data_chunk out(Ki_size);
+    if (!EC_POINT_point2oct(group, Ki, POINT_CONVERSION_COMPRESSED, out.data(),
+        out.size(), ctx))
+        return hd_public_key();
+    // ************************************************************************
+
+    hd_key_lineage lineage = hd_key_lineage{ lineage_.testnet,
+        static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i };
+
+    return hd_public_key(out, I.right, lineage);
 }
 
 BCW_API hd_private_key::hd_private_key()
@@ -222,17 +263,24 @@ BCW_API hd_private_key::hd_private_key(const secret_parameter& private_key,
 BCW_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
   : hd_public_key()
 {
-    const char hmac_key[] = "Bitcoin seed";
-    split_hmac I = hmac_sha512(hmac_key, (int)strlen(hmac_key), seed);
+    constexpr uint32_t key_length = 13;
+    const uint8_t hmac_key[key_length] = "Bitcoin seed";
+
+    split_long_hash I = split(hmac_sha512(hmac_key, key_length, seed));
+    ssl_bignum il = BN_bin2bn(I.left.data(), (int)I.left.size(), nullptr);
+
+    // ************************************************************************
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(),
+        nullptr);
+    // ************************************************************************
 
     // The key is invalid if parse256(IL) >= n or 0:
-    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(
-        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
     if (0 <= BN_cmp(il, n) || BN_is_zero(il.ptr))
         return;
 
-    *this = hd_private_key(I.IL, I.IR, hd_key_lineage{testnet, 0, {{0}}, 0});
+    hd_key_lineage null_seed = hd_key_lineage{ testnet, 0, { { 0 } }, 0 };
+
+    *this = hd_private_key(I.left, I.right, null_seed);
 }
 
 BCW_API const secret_parameter& hd_private_key::private_key() const
@@ -245,8 +293,8 @@ BCW_API std::string hd_private_key::serialize() const
     data_chunk data;
     data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
 
-    extend_data(data, ser32(lineage_.testnet ?
-        testnet_private_prefix : mainnet_private_prefix));
+    extend_data(data, ser32(lineage_.testnet ? testnet_private_prefix : 
+        mainnet_private_prefix));
     data.push_back(lineage_.depth);
     extend_data(data, lineage_.parent_fingerprint);
     extend_data(data, ser32(lineage_.child_number));
@@ -254,7 +302,7 @@ BCW_API std::string hd_private_key::serialize() const
     data.push_back(0x00);
     extend_data(data, k_);
 
-    extend_data(data, uncast_type(generate_checksum(data)));
+    extend_data(data, uncast_type(bitcoin_checksum(data)));
     return encode_base58(data);
 }
 
@@ -276,17 +324,23 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
         extend_data(data, K_);
         extend_data(data, ser32(i));
     }
-    auto I = hmac_sha512(c_.data(), (int)c_.size(), data);
+
+    auto I = split(hmac_sha512(c_.data(), (int)c_.size(), data));
 
     // The child key ki is (parse256(IL) + kpar) mod n:
     ssl_bn_ctx ctx = BN_CTX_new();
     ssl_bignum ki = BN_new();
     ssl_bignum kpar = BN_bin2bn(k_.data(), (int)k_.size(), nullptr);
-    ssl_bignum il = BN_bin2bn(I.IL.data(), (int)I.IL.size(), nullptr);
-    ssl_bignum n = BN_bin2bn(
-        secp256k1_n.data(), (int)secp256k1_n.size(), nullptr);
+    ssl_bignum il = BN_bin2bn(I.left.data(), (int)I.left.size(), nullptr);
+
+    // ************************************************************************
+    ssl_bignum n = BN_bin2bn(secp256k1_n.data(), (int)secp256k1_n.size(),
+        nullptr);
+    // ************************************************************************
+
     if (!ctx || !ki || !kpar || !il || !n)
         return hd_private_key();
+
     if (!BN_mod_add(ki, kpar, il, n, ctx))
         return hd_private_key();
 
@@ -294,13 +348,20 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i)
     if (0 <= BN_cmp(il, n) || BN_is_zero(ki.ptr))
         return hd_private_key();
 
-    secret_parameter out{{0}};
+    secret_parameter out{ { 0 } };
     int ki_size = BN_num_bytes(ki);
     if (ki_size != BN_bn2bin(ki, &out[out.size() - ki_size]))
         return hd_private_key();
 
-    return hd_private_key(out, I.IR, hd_key_lineage{lineage_.testnet,
-        static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i});
+    hd_key_lineage lineage = hd_key_lineage
+    {
+        lineage_.testnet,
+        static_cast<uint8_t>(lineage_.depth + 1),
+        fingerprint(),
+        i
+    };
+
+    return hd_private_key(out, I.right, lineage);
 }
 
 BCW_API hd_public_key hd_private_key::generate_public_key(uint32_t i)
