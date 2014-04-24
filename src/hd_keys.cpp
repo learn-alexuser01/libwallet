@@ -308,7 +308,7 @@ BCW_API bool hd_private_key::set_serialized(std::string encoded)
     constexpr auto ec_secret_size = // TODO: integrate libsecp256k1
         std::tuple_size<secret_parameter>::value;
 
-    lineage_.testnet = prefix == testnet_private_prefix;
+    lineage_.testnet = false;
     lineage_.depth = ds.read_byte();
     lineage_.parent_fingerprint = ds.read_little_endian<uint32_t>();
     lineage_.child_number = ds.read_big_endian<uint32_t>();

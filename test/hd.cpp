@@ -180,3 +180,17 @@ BOOST_AUTO_TEST_CASE(hd_keys_serialize)
     libwallet::hd_public_key& public_part = private_key;
     BOOST_REQUIRE(public_part.serialize() == public_string);
 }
+
+BOOST_AUTO_TEST_CASE(hd_keys_serialize_derive)
+{
+    std::string private_string =
+        "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPP"
+        "qjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi";
+
+    libwallet::hd_private_key private_key;
+    BOOST_REQUIRE(private_key.set_serialized(private_string));
+    BOOST_REQUIRE(private_key.generate_private_key(0).serialize() ==
+        "xprv9vHkqa6EV4sPZHYqZznhT2NPtPCjKuDKGY38FBWLvgaDx45zo9WQ"
+        "RUT3dKYnjwih2yJD9mkrocEZXo1ex8G81dwSM1fwqWpWkeS3v86pgKt");
+}
+
