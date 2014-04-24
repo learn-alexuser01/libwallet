@@ -75,7 +75,7 @@ constexpr uint32_t mainnet_private_prefix = 0x0488ADE4;
 constexpr uint32_t mainnet_public_prefix = 0x0488B21E;
 constexpr uint32_t testnet_private_prefix = 0x04358394;
 constexpr uint32_t testnet_public_prefix = 0x043587CF;
-constexpr auto serialized_length = 4 + 1 + 4 + 4 + 32 + 33 + 4;
+constexpr size_t serialized_length = 4 + 1 + 4 + 4 + 32 + 33 + 4;
 
 static data_chunk secret_to_public_key(const secret_parameter& secret)
 {
