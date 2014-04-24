@@ -20,7 +20,7 @@
 #define LIBWALLET_KEY_FORMATS_HPP
 
 #include <string>
-#include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <bitcoin/utility/ec_keys.hpp>
 #include <wallet/define.hpp>
 
 namespace libwallet {
@@ -39,20 +39,20 @@ using namespace libbitcoin;
  * @endcode
  */
 BCW_API std::string secret_to_wif(
-    const secret_parameter& secret, bool compressed=true);
+    const ec_secret& secret, bool compressed=true);
 
 /**
  * Convert wallet import format key to secret parameter.
  * Returns a nulled secret on error.
  *
  * @code
- *  secret_parameter secret = wif_to_secret(
+ *  ec_secret secret = wif_to_secret(
  *      "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ");
  *  if (secret == null_hash)
  *      // Error...
  * @endcode
  */
-BCW_API secret_parameter wif_to_secret(const std::string& wif);
+BCW_API ec_secret wif_to_secret(const std::string& wif);
 
 /**
  * Checks to see if a wif refers to a compressed public key.
@@ -60,7 +60,7 @@ BCW_API secret_parameter wif_to_secret(const std::string& wif);
  * Returns false otherwise.
  *
  * @code
- *  bool compressed = is_wif_compressed(      
+ *  bool compressed = is_wif_compressed(
  *		"5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ");
  *  if (compressed == false)
  *      // Wif is not compressed
@@ -73,13 +73,13 @@ BCW_API bool is_wif_compressed(const std::string& wif);
  * Returns a nulled secret on error.
  *
  * @code
- *  secret_parameter secret =
+ *  ec_secret secret =
  *      minikey_to_secret("S6c56bnXQiBjk9mqSYE7ykVQ7NzrRy");
  *  if (secret == null_hash)
  *      // Error...
  * @endcode
  */
-BCW_API secret_parameter minikey_to_secret(const std::string& minikey);
+BCW_API ec_secret minikey_to_secret(const std::string& minikey);
 
 } // libwallet
 

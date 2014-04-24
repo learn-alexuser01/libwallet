@@ -24,7 +24,7 @@ using namespace libwallet;
 
 BOOST_AUTO_TEST_CASE(wif_test)
 {
-    secret_parameter secret =
+    ec_secret secret =
     {{
         0x80, 0x10, 0xB1, 0xBB, 0x11, 0x9A, 0xD3, 0x7D,
         0x4B, 0x65, 0xA1, 0x02, 0x2A, 0x31, 0x48, 0x97,
@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE(wif_test)
     BOOST_REQUIRE(is_wif_compressed(compressed));
     BOOST_REQUIRE(!is_wif_compressed(uncompressed));
 
-    secret_parameter from_wif = wif_to_secret(compressed);
+    ec_secret from_wif = wif_to_secret(compressed);
     BOOST_REQUIRE(std::equal(secret.begin(), secret.end(), from_wif.begin()));
     from_wif = wif_to_secret(uncompressed);
     BOOST_REQUIRE(std::equal(secret.begin(), secret.end(), from_wif.begin()));
