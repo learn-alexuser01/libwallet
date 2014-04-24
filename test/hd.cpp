@@ -184,8 +184,8 @@ BOOST_AUTO_TEST_CASE(hd_keys_serialize)
 BOOST_AUTO_TEST_CASE(hd_keys_serialize_derive)
 {
     std::string private_string =
-        "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPP"
-        "qjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi";
+        "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtAL"
+        "Gdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U";
 
     libwallet::hd_private_key private_key;
     BOOST_REQUIRE(private_key.set_serialized(private_string));
