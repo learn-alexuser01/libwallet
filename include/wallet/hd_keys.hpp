@@ -20,7 +20,7 @@
 #define LIBWALLET_HD_KEYS_HPP
 
 #include <bitcoin/address.hpp>
-#include <bitcoin/utility/elliptic_curve_key.hpp>
+#include <bitcoin/utility/ec_keys.hpp>
 #include <wallet/define.hpp>
 
 namespace libwallet {
@@ -50,12 +50,12 @@ class hd_public_key
 {
 public:
     BCW_API hd_public_key();
-    BCW_API hd_public_key(const data_chunk& public_key,
+    BCW_API hd_public_key(const ec_point& public_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
 
     BCW_API bool valid() const;
 
-    BCW_API const data_chunk& public_key() const;
+    BCW_API const ec_point& public_key() const;
     BCW_API const chain_code_type& chain_code() const;
     BCW_API const hd_key_lineage& lineage() const;
 
@@ -68,7 +68,7 @@ public:
 
 protected:
     bool valid_;
-    data_chunk K_; // EC point
+    ec_point K_; // EC point
     chain_code_type c_;
     hd_key_lineage lineage_;
 };
@@ -81,11 +81,11 @@ class hd_private_key
 {
 public:
     BCW_API hd_private_key();
-    BCW_API hd_private_key(const secret_parameter& private_key,
+    BCW_API hd_private_key(const ec_secret& private_key,
         const chain_code_type& chain_code, hd_key_lineage lineage);
     BCW_API hd_private_key(const data_chunk& seed, bool testnet=false);
 
-    BCW_API const secret_parameter& private_key() const;
+    BCW_API const ec_secret& private_key() const;
 
     BCW_API bool set_serialized(std::string encoded);
     BCW_API std::string serialize() const;
@@ -94,7 +94,7 @@ public:
     BCW_API hd_public_key generate_public_key(uint32_t i) const;
 
 protected:
-    secret_parameter k_;
+    ec_secret k_;
 };
 
 } // namespace libwallet
