@@ -22,40 +22,38 @@
 
 namespace libwallet {
 
-typedef data_chunk private_data;
-
 std::string secret_to_wif(const secret_parameter& secret, bool compressed)
 {
-    private_data unencoded_data(secret.begin(), secret.end());
-    unencoded_data.insert(unencoded_data.begin(), 
-        payment_address::wif_version);
+    data_chunk data;
+    data.reserve(1 + hash_size + 1 + 4);
 
+    data.push_back(payment_address::wif_version);
+    extend_data(data, secret);
     if (compressed)
-        extend_data(unencoded_data, uncast_type<uint8_t>(0x01));
+        data.push_back(0x01);
 
-    uint32_t checksum = bitcoin_checksum(unencoded_data);
-    extend_data(unencoded_data, uncast_type(checksum));
-    return encode_base58(unencoded_data);
+    append_checksum(data);
+    return encode_base58(data);
 }
 
 secret_parameter wif_to_secret(const std::string& wif)
 {
-    private_data decoded = decode_base58(wif);
+    if (!is_base58(wif))
+        return secret_parameter();
+    data_chunk decoded = decode_base58(wif);
     // 1 marker, 32 byte secret, optional 1 compressed flag, 4 checksum bytes
     if (decoded.size() != 1 + hash_size + 4 &&
         decoded.size() != 1 + hash_size + 1 + 4)
         return secret_parameter();
-    // Check first byte is valid and remove it
+    if (!verify_checksum(decoded))
+        return secret_parameter();
+    // Check first byte is valid
     if (decoded[0] != payment_address::wif_version)
         return secret_parameter();
-    // Proceed to verify the checksum
-    private_data checksum_bytes(decoded.end() - 4, decoded.end());
-    BITCOIN_ASSERT(checksum_bytes.size() == 4);
-    decoded.erase(decoded.end() - 4, decoded.end());
-    if (cast_chunk<uint32_t>(checksum_bytes) != bitcoin_checksum(decoded))
-        return secret_parameter();
-    // Checks passed. Drop the 0x80 start byte.
+
+    // Checks passed. Drop the 0x80 start byte and checksum.
     decoded.erase(decoded.begin());
+    decoded.erase(decoded.end() - 4, decoded.end());
     // If length is still 33 and last byte is 0x01, drop it.
     if (decoded.size() == 33 && decoded[32] == (uint8_t)0x01)
         decoded.erase(decoded.begin()+32);
@@ -87,7 +85,7 @@ bool check_minikey(const std::string& minikey)
 
 secret_parameter minikey_to_secret(const std::string& minikey)
 {
-    return check_minikey(minikey) ? single_sha256(minikey) : 
+    return check_minikey(minikey) ? single_sha256(minikey) :
         secret_parameter();
 }
 
