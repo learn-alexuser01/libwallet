@@ -85,7 +85,7 @@ static data_chunk secret_to_public_key(const secret_parameter& secret)
 
 // long_hash is used for hmac_sha512 in libbitcoin
 constexpr size_t half_long_hash_size = long_hash_size / 2;
-typedef std::array<uint8_t, half_long_hash_size> half_long_hash;
+typedef byte_array<half_long_hash_size> half_long_hash;
 
 /**
  * Corresponds to a split HMAC-SHA256 result, as used in BIP 32.
@@ -102,16 +102,6 @@ static split_long_hash split(const long_hash& hmac)
     std::copy(hmac.begin(), hmac.begin() + half_long_hash_size, I.L.begin());
     std::copy(hmac.begin() + half_long_hash_size, hmac.end(), I.R.begin());
     return I;
-}
-
-static ser32_type ser32(uint32_t i)
-{
-    ser32_type out;
-    out[0] = 0xff & (i >> 24);
-    out[1] = 0xff & (i >> 16);
-    out[2] = 0xff & (i >> 8);
-    out[3] = 0xff & i;
-    return out;
 }
 
 BCW_API hd_public_key::hd_public_key()
@@ -153,10 +143,10 @@ BCW_API std::string hd_public_key::serialize() const
     if (lineage_.testnet)
         prefix = testnet_public_prefix;
 
-    extend_data(data, ser32(prefix));
+    extend_data(data, to_big_endian(prefix));
     data.push_back(lineage_.depth);
-    extend_data(data, lineage_.parent_fingerprint);
-    extend_data(data, ser32(lineage_.child_number));
+    extend_data(data, to_little_endian(lineage_.parent_fingerprint));
+    extend_data(data, to_big_endian(lineage_.child_number));
     extend_data(data, c_);
     extend_data(data, K_);
 
@@ -164,10 +154,10 @@ BCW_API std::string hd_public_key::serialize() const
     return encode_base58(data);
 }
 
-BCW_API ser32_type hd_public_key::fingerprint() const
+BCW_API uint32_t hd_public_key::fingerprint() const
 {
     short_hash md = bitcoin_short_hash(K_);
-    return ser32_type{{md[0], md[1], md[2], md[3]}};
+    return from_little_endian<uint32_t>(md.begin());
 }
 
 BCW_API payment_address hd_public_key::address() const
@@ -187,7 +177,7 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i) const
     data_chunk data;
     data.reserve(33 + 4);
     extend_data(data, K_);
-    extend_data(data, ser32(i));
+    extend_data(data, to_big_endian(i));
     auto I = split(hmac_sha512_hash(data, to_data_chunk(c_)));
 
     // ************************************************************************
@@ -229,9 +219,12 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i) const
         return hd_public_key();
     // ************************************************************************
 
-    hd_key_lineage lineage = hd_key_lineage{ lineage_.testnet,
-        static_cast<uint8_t>(lineage_.depth + 1), fingerprint(), i };
-
+    auto lineage = hd_key_lineage
+    {
+        lineage_.testnet,
+        static_cast<uint8_t>(lineage_.depth + 1),
+        fingerprint(), i
+    };
     return hd_public_key(out, I.R, lineage);
 }
 
@@ -263,9 +256,8 @@ BCW_API hd_private_key::hd_private_key(const data_chunk& seed, bool testnet)
     if (0 <= BN_cmp(il, n) || BN_is_zero(il.ptr))
         return;
 
-    hd_key_lineage null_seed = hd_key_lineage{ testnet, 0, { { 0 } }, 0 };
-
-    *this = hd_private_key(I.L, I.R, null_seed);
+    auto lineage = hd_key_lineage{testnet, 0, 0, 0};
+    *this = hd_private_key(I.L, I.R, lineage);
 }
 
 BCW_API const secret_parameter& hd_private_key::private_key() const
@@ -281,10 +273,10 @@ BCW_API std::string hd_private_key::serialize() const
     if (lineage_.testnet)
         prefix = testnet_private_prefix;
 
-    extend_data(data, ser32(prefix));
+    extend_data(data, to_big_endian(prefix));
     data.push_back(lineage_.depth);
-    extend_data(data, lineage_.parent_fingerprint);
-    extend_data(data, ser32(lineage_.child_number));
+    extend_data(data, to_little_endian(lineage_.parent_fingerprint));
+    extend_data(data, to_big_endian(lineage_.child_number));
     extend_data(data, c_);
     data.push_back(0x00);
     extend_data(data, k_);
@@ -304,12 +296,12 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i) const
     {
         data.push_back(0x00);
         extend_data(data, k_);
-        extend_data(data, ser32(i));
+        extend_data(data, to_big_endian(i));
     }
     else
     {
         extend_data(data, K_);
-        extend_data(data, ser32(i));
+        extend_data(data, to_big_endian(i));
     }
     auto I = split(hmac_sha512_hash(data, to_data_chunk(c_)));
 
@@ -339,14 +331,13 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i) const
     if (ki_size != BN_bn2bin(ki, &out[out.size() - ki_size]))
         return hd_private_key();
 
-    hd_key_lineage lineage = hd_key_lineage
+    auto lineage = hd_key_lineage
     {
         lineage_.testnet,
         static_cast<uint8_t>(lineage_.depth + 1),
         fingerprint(),
         i
     };
-
     return hd_private_key(out, I.R, lineage);
 }
 

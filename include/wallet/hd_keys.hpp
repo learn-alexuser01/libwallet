@@ -27,8 +27,8 @@ namespace libwallet {
 
 using namespace libbitcoin;
 
-typedef std::array<uint8_t, 4> ser32_type;
-typedef std::array<uint8_t, 32> chain_code_type;
+constexpr size_t chain_code_size = 32;
+typedef byte_array<chain_code_size> chain_code_type;
 
 constexpr uint32_t first_hardened_key = 1 << 31;
 
@@ -39,7 +39,7 @@ struct BCW_API hd_key_lineage
 {
     bool testnet;
     uint8_t depth;
-    ser32_type parent_fingerprint;
+    uint32_t parent_fingerprint;
     uint32_t child_number;
 };
 
@@ -59,7 +59,7 @@ public:
     BCW_API const chain_code_type& chain_code() const;
     BCW_API const hd_key_lineage& lineage() const;
     BCW_API std::string serialize() const;
-    BCW_API ser32_type fingerprint() const;
+    BCW_API uint32_t fingerprint() const;
     BCW_API payment_address address() const;
 
     BCW_API hd_public_key generate_public_key(uint32_t i) const;
