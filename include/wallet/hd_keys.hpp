@@ -58,6 +58,8 @@ public:
     BCW_API const data_chunk& public_key() const;
     BCW_API const chain_code_type& chain_code() const;
     BCW_API const hd_key_lineage& lineage() const;
+
+    BCW_API bool set_serialized(std::string encoded);
     BCW_API std::string serialize() const;
     BCW_API uint32_t fingerprint() const;
     BCW_API payment_address address() const;
@@ -84,6 +86,8 @@ public:
     BCW_API hd_private_key(const data_chunk& seed, bool testnet=false);
 
     BCW_API const secret_parameter& private_key() const;
+
+    BCW_API bool set_serialized(std::string encoded);
     BCW_API std::string serialize() const;
 
     BCW_API hd_private_key generate_private_key(uint32_t i) const;

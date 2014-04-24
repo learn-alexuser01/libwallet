@@ -6,7 +6,7 @@
  * libwallet is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License with
  * additional permissions to the one published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) 
+ * Foundation, either version 3 of the License, or (at your option)
  * any later version. For more information see LICENSE.
  *
  * This program is distributed in the hope that it will be useful,
@@ -149,3 +149,34 @@ BOOST_AUTO_TEST_CASE(hd_keys_vector2)
         "nLFbdpq8p9HmGsApME5hQTZ3emM2rnY5agb9rXpVGyy3bdW6EEgAtqt");
 }
 
+BOOST_AUTO_TEST_CASE(hd_keys_serialize)
+{
+    std::string public_string =
+        "xpub6FnCn6nSzZAw5Tw7cgR9bi15UV96gLZhjDstkXXxvCLsUXBGXPdS"
+        "nLFbdpq8p9HmGsApME5hQTZ3emM2rnY5agb9rXpVGyy3bdW6EEgAtqt";
+    std::string private_string =
+        "xprvA2nrNbFZABcdryreWet9Ea4LvTJcGsqrMzxHx98MMrotbir7yrKC"
+        "EXw7nadnHM8Dq38EGfSh6dqA9QWTyefMLEcBYJUuekgW4BYPJcr9E7j";
+
+    // Simple public key round trip:
+    libwallet::hd_public_key public_key;
+    BOOST_REQUIRE(public_key.set_serialized(public_string));
+    BOOST_REQUIRE(public_key.serialize() == public_string);
+
+    // Invalid public keys:
+    BOOST_REQUIRE(!public_key.set_serialized(private_string));
+    BOOST_REQUIRE(!public_key.set_serialized(public_string + ' '));
+
+    // Simple private key round trip:
+    libwallet::hd_private_key private_key;
+    BOOST_REQUIRE(private_key.set_serialized(private_string));
+    BOOST_REQUIRE(private_key.serialize() == private_string);
+
+    // Invalid private keys:
+    BOOST_REQUIRE(!private_key.set_serialized(public_string));
+    BOOST_REQUIRE(!private_key.set_serialized(private_string + ' '));
+
+    // Casting away private part:
+    libwallet::hd_public_key& public_part = private_key;
+    BOOST_REQUIRE(public_part.serialize() == public_string);
+}

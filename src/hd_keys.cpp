@@ -75,6 +75,7 @@ constexpr uint32_t mainnet_private_prefix = 0x0488ADE4;
 constexpr uint32_t mainnet_public_prefix = 0x0488B21E;
 constexpr uint32_t testnet_private_prefix = 0x04358394;
 constexpr uint32_t testnet_public_prefix = 0x043587CF;
+constexpr auto serialized_length = 4 + 1 + 4 + 4 + 32 + 33 + 4;
 
 static data_chunk secret_to_public_key(const secret_parameter& secret)
 {
@@ -135,10 +136,34 @@ BCW_API const hd_key_lineage& hd_public_key::lineage() const
     return lineage_;
 }
 
+BCW_API bool hd_public_key::set_serialized(std::string encoded)
+{
+    if (!is_base58(encoded))
+        return false;
+    const data_chunk decoded = decode_base58(encoded);
+    if (decoded.size() != serialized_length)
+        return false;
+    if (!verify_checksum(decoded))
+        return false;
+
+    auto ds = make_deserializer(decoded.begin(), decoded.end());
+    auto prefix = ds.read_big_endian<uint32_t>();
+    if (prefix != mainnet_public_prefix && prefix != testnet_public_prefix)
+        return false;
+
+    lineage_.testnet = prefix == testnet_public_prefix;
+    lineage_.depth = ds.read_byte();
+    lineage_.parent_fingerprint = ds.read_little_endian<uint32_t>();
+    lineage_.child_number = ds.read_big_endian<uint32_t>();
+    c_ = ds.read_bytes<chain_code_size>();
+    K_ = ds.read_data(33);
+    return true;
+}
+
 BCW_API std::string hd_public_key::serialize() const
 {
     data_chunk data;
-    data.reserve(4 + 1 + 4 + 4 + 32 + 33 + 4);
+    data.reserve(serialized_length);
     auto prefix = mainnet_public_prefix;
     if (lineage_.testnet)
         prefix = testnet_public_prefix;
@@ -150,7 +175,7 @@ BCW_API std::string hd_public_key::serialize() const
     extend_data(data, c_);
     extend_data(data, K_);
 
-    extend_data(data, uncast_type(bitcoin_checksum(data)));
+    append_checksum(data);
     return encode_base58(data);
 }
 
@@ -265,6 +290,35 @@ BCW_API const secret_parameter& hd_private_key::private_key() const
     return k_;
 }
 
+BCW_API bool hd_private_key::set_serialized(std::string encoded)
+{
+    if (!is_base58(encoded))
+        return false;
+    const data_chunk decoded = decode_base58(encoded);
+    if (decoded.size() != serialized_length)
+        return false;
+    if (!verify_checksum(decoded))
+        return false;
+
+    auto ds = make_deserializer(decoded.begin(), decoded.end());
+    auto prefix = ds.read_big_endian<uint32_t>();
+    if (prefix != mainnet_private_prefix && prefix != testnet_private_prefix)
+        return false;
+
+    constexpr auto ec_secret_size = // TODO: integrate libsecp256k1
+        std::tuple_size<secret_parameter>::value;
+
+    lineage_.testnet = prefix == testnet_private_prefix;
+    lineage_.depth = ds.read_byte();
+    lineage_.parent_fingerprint = ds.read_little_endian<uint32_t>();
+    lineage_.child_number = ds.read_big_endian<uint32_t>();
+    c_ = ds.read_bytes<chain_code_size>();
+    ds.read_byte();
+    k_ = ds.read_bytes<ec_secret_size>();
+    K_ = secret_to_public_key(k_);
+    return true;
+}
+
 BCW_API std::string hd_private_key::serialize() const
 {
     data_chunk data;
@@ -281,7 +335,7 @@ BCW_API std::string hd_private_key::serialize() const
     data.push_back(0x00);
     extend_data(data, k_);
 
-    extend_data(data, uncast_type(bitcoin_checksum(data)));
+    append_checksum(data);
     return encode_base58(data);
 }
 
