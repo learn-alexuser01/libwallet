@@ -69,24 +69,19 @@ bool is_wif_compressed(const std::string& wif) {
         decoded[33] == (uint8_t)0x01;
 }
 
-hash_digest single_sha256(const std::string& mini)
-{
-    data_chunk chunk = data_chunk(mini.begin(), mini.end());
-    return sha256_hash(chunk);
-}
-
 bool check_minikey(const std::string& minikey)
 {
     // Legacy minikeys are 22 chars long
     if (minikey.size() != 22 && minikey.size() != 30)
         return false;
-    return single_sha256(minikey + "?")[0] == 0x00;
+    return sha256_hash(to_data_chunk(minikey + "?"))[0] == 0x00;
 }
 
 ec_secret minikey_to_secret(const std::string& minikey)
 {
-    return check_minikey(minikey) ? single_sha256(minikey) :
-        ec_secret();
+    if (!check_minikey(minikey))
+        return ec_secret();
+    return sha256_hash(to_data_chunk(minikey));
 }
 
 } // libwallet
