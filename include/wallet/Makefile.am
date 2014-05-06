@@ -7,5 +7,6 @@ wallet_include_HEADERS = \
     electrum_keys.hpp \
     hd_keys.hpp \
     mnemonic.hpp \
+    stealth.hpp \
     uri.hpp
 
