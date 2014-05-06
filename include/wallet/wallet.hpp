@@ -26,6 +26,7 @@
 #include <wallet/hd_keys.hpp>
 #include <wallet/key_formats.hpp>
 #include <wallet/transaction.hpp>
+#include <wallet/stealth.hpp>
 #include <wallet/uri.hpp>
 
 #endif
