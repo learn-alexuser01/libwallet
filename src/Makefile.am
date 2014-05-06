@@ -8,6 +8,7 @@ libwallet_la_SOURCES = \
     transaction.cpp \
     hd_keys.cpp \
     key_formats.cpp \
+    stealth.cpp \
     uri.cpp
 
 libwallet_la_LIBADD = $(libbitcoin_LIBS)
