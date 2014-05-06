@@ -20,17 +20,9 @@
 /*
   Demonstration of URI utilities.
 */
+#include <iostream>
 #include <bitcoin/bitcoin.hpp>
 #include <wallet/wallet.hpp>
-
-void reset(libwallet::uri_parse_result& result)
-{
-    result.address.reset();
-    result.amount.reset();
-    result.label.reset();
-    result.message.reset();
-    result.r.reset();
-}
 
 /**
  * Example class to demonstrate handling custom URI parameters.
@@ -50,194 +42,37 @@ protected:
 
 int main()
 {
-    libwallet::uri_parse_result result;
-    bool success = false;
-
-    // Typical-looking URI:
-    success = libwallet::uri_parse(
-        "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?amount=0.1", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
-        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
-    BITCOIN_ASSERT(result.amount && result.amount.get() == 10000000);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(!result.r);
-
-    // Various scheme spellings and blank structure elements:
-    BITCOIN_ASSERT( libwallet::uri_parse("bitcoin:", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcorn:", result));
-    BITCOIN_ASSERT( libwallet::uri_parse("BITCOIN:?", result));
-    BITCOIN_ASSERT( libwallet::uri_parse("Bitcoin:?&", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcOin:&", result));
-
-    // Various blank parameter elements:
-    BITCOIN_ASSERT( libwallet::uri_parse("bitcoin:?x=y", result));
-    BITCOIN_ASSERT( libwallet::uri_parse("bitcoin:?x=", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:?=y", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:?=", result));
-    BITCOIN_ASSERT( libwallet::uri_parse("bitcoin:?x", result));
-
-    // Address only:
-    reset(result);
-    success = libwallet::uri_parse(
-        "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
-        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
-    BITCOIN_ASSERT(!result.amount);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(!result.r);
-
-    // Percent-encoding in address:
-    reset(result);
-    success = libwallet::uri_parse(
-        "bitcoin:%3113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.address && result.address.get().encoded() == 
-        "113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD");
-
-    // Malformed addresses:
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:19l88", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:19z88", result));
-
-    // Amount only:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?amount=4.2", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!result.address);
-    BITCOIN_ASSERT(result.amount && result.amount.get() == 420000000);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(!result.r);
-
-    // Minimal amount:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?amount=.", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.amount && result.amount.get() == 0);
-
-    // Malformed amounts:
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:amount=4.2.1", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:amount=bob", result));
-
-    // Label only:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?label=test", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!result.address);
-    BITCOIN_ASSERT(!result.amount);
-    BITCOIN_ASSERT(result.label && result.label.get() == "test");
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(!result.r);
-
-    // UTF-8 percent encoding:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?label=%E3%83%95", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.label && result.label.get() == "フ");
-
-    // Reserved symbol encoding and lowercase percent encoding:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?label=%26%3d%6b", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.label && result.label.get() == "&=k");
-
-    // Malformed percent encoding:
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:label=%3", result));
-    BITCOIN_ASSERT(!libwallet::uri_parse("bitcoin:label=%3G", result));
-
-    // Lenient parsing:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?label=Some テスト", result, false);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(result.label && result.label.get() == "Some テスト");
-
-    // Strict parsing:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?label=Some テスト", result, true);
-    BITCOIN_ASSERT(!success);
-
-    // Message only:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?message=Hi%20Alice", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!result.address);
-    BITCOIN_ASSERT(!result.amount);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(result.message && result.message.get() == "Hi Alice");
-    BITCOIN_ASSERT(!result.r);
-
-    // Payment protocol only:
-    reset(result);
-    success = libwallet::uri_parse(
-        "bitcoin:?r=http://www.example.com?purchase%3Dshoes", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!result.address);
-    BITCOIN_ASSERT(!result.amount);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(result.r &&
-        result.r.get() == "http://www.example.com?purchase=shoes");
-
-    // Unknown optional parameter:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?ignore=true", result);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!result.address);
-    BITCOIN_ASSERT(!result.amount);
-    BITCOIN_ASSERT(!result.label);
-    BITCOIN_ASSERT(!result.message);
-    BITCOIN_ASSERT(!result.r);
-
-    // Unknown required parameter:
-    reset(result);
-    success = libwallet::uri_parse("bitcoin:?req-ignore=false", result);
-    BITCOIN_ASSERT(!success);
-
-    // Custom parameter type:
-    custom_result custom;
-    success = libwallet::uri_parse("bitcoin:?myparam=here", custom);
-    BITCOIN_ASSERT(success);
-    BITCOIN_ASSERT(!custom.address);
-    BITCOIN_ASSERT(!custom.amount);
-    BITCOIN_ASSERT(!custom.label);
-    BITCOIN_ASSERT(!custom.message);
-    BITCOIN_ASSERT(!custom.r);
-    BITCOIN_ASSERT(custom.myparam && custom.myparam.get() == "here");
-
-    // Number parser:
-    BITCOIN_ASSERT(libwallet::parse_amount("4.432") == 443200000);
-    BITCOIN_ASSERT(libwallet::parse_amount("4.432.") == 
-        libwallet::invalid_amount);
-    BITCOIN_ASSERT(libwallet::parse_amount("4")  == 400000000);
-    BITCOIN_ASSERT(libwallet::parse_amount("4.") == 400000000);
-    BITCOIN_ASSERT(libwallet::parse_amount(".4") == 40000000);
-    BITCOIN_ASSERT(libwallet::parse_amount(".")  == 0);
-    BITCOIN_ASSERT(libwallet::parse_amount("0.00000004")  == 4);
-    BITCOIN_ASSERT(libwallet::parse_amount("0.000000044") == 4);
-    BITCOIN_ASSERT(libwallet::parse_amount("0.000000045") == 5);
-    BITCOIN_ASSERT(libwallet::parse_amount("0.000000049") == 5);
-    BITCOIN_ASSERT(libwallet::parse_amount("4.432112395") == 443211240);
-    BITCOIN_ASSERT(libwallet::parse_amount("21000000") == 2100000000000000);
-    BITCOIN_ASSERT(libwallet::parse_amount("1234.9", 0) == 1235);
-    BITCOIN_ASSERT(libwallet::parse_amount("64.25", 5) == 6425000);
-
+    // Write a URI:
     libwallet::uri_writer writer;
     writer.write_address(std::string("113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD"));
     writer.write_amount(120000);
     writer.write_amount(10000000000);
     writer.write_label("&=\n");
     writer.write_message("hello bitcoin");
+    writer.write_param("myparam", "result");
     writer.write_r("http://example.com?purchase=shoes&user=bob");
 
-    BITCOIN_ASSERT(writer.string() ==
-        "bitcoin:113Pfw4sFqN1T5kXUnKbqZHMJHN9oyjtgD?"
-        "amount=0.0012&amount=100&"
-        "label=%26%3D%0A&"
-        "message=hello%20bitcoin&"
-        "r=http://example.com?purchase%3Dshoes%26user%3Dbob");
+    std::cout << writer.string() << std::endl;
+
+    // Parse the URI back out, using our result parameter handler:
+    custom_result result;
+    bool success = libwallet::uri_parse(writer.string(), result);
+    if (!success)
+        return 1;
+
+    // Display the results:
+    if (result.address)
+        std::cout << "address: " << result.address.get().encoded() << std::endl;
+    if (result.amount)
+        std::cout << "amount: " << result.amount.get() << std::endl;
+    if (result.label)
+        std::cout << "label: " << result.label.get() << std::endl;
+    if (result.message)
+        std::cout << "message: " << result.message.get() << std::endl;
+    if (result.r)
+        std::cout << "r: " << result.r.get() << std::endl;
+    if (result.myparam)
+        std::cout << "myparam: " << result.myparam.get() << std::endl;
 
     return 0;
 }
