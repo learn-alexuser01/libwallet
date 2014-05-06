@@ -95,5 +95,22 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     return true;
 }
 
+BCW_API initiate_stealth_result initiate_stealth(
+    const stealth_address& address)
+{
+}
+
+BCW_API data_chunk uncover_stealth(
+    const data_chunk& ephemkey, const secret_parameter& scan_privkey,
+    const data_chunk& spend_pubkey)
+{
+}
+
+BCW_API secret_parameter uncover_stealth_secret(
+    const data_chunk& ephemkey, const secret_parameter& scan_privkey,
+    const secret_parameter& spend_privkey)
+{
+}
+
 } // namespace libwallet
 
