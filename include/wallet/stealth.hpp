@@ -20,6 +20,8 @@
 #define LIBWALLET_STEALTH_HPP
 
 #include <bitcoin/stealth.hpp>
+#include <bitcoin/address.hpp>
+#include <bitcoin/utility/ec_keys.hpp>
 #include <wallet/define.hpp>
 
 namespace libwallet {
@@ -61,11 +63,11 @@ struct BCW_API initiate_stealth_result
 BCW_API initiate_stealth_result initiate_stealth(
     const stealth_address& address);
 BCW_API data_chunk uncover_stealth(
-    const data_chunk& ephemkey, const secret_parameter& scan_privkey,
+    const data_chunk& ephemkey, const ec_secret& scan_privkey,
     const data_chunk& spend_pubkey);
-BCW_API data_chunk uncover_stealth_secret(
-    const data_chunk& ephemkey, const secret_parameter& scan_privkey,
-    const secret_parameter& spend_privkey);
+BCW_API ec_secret uncover_stealth_secret(
+    const data_chunk& ephemkey, const ec_secret& scan_privkey,
+    const ec_secret& spend_privkey);
 
 } // namespace libwallet
 
