@@ -31,14 +31,14 @@ using namespace libbitcoin;
 class stealth_address
 {
 public:
-    typedef std::vector<data_chunk> pubkey_list;
+    typedef std::vector<ec_point> pubkey_list;
     enum
     {
         reuse_key_option = 0x01
     };
 
     BCW_API uint8_t options() const;
-    BCW_API const data_chunk& scan_pubkey() const;
+    BCW_API const ec_point& scan_pubkey() const;
     BCW_API const pubkey_list& spend_pubkeys() const;
     BCW_API size_t number_signatures() const;
     BCW_API const stealth_prefix& prefix() const;
@@ -47,7 +47,7 @@ public:
 
 private:
     uint8_t options_ = 0;
-    data_chunk scan_pubkey_;
+    ec_point scan_pubkey_;
     pubkey_list spend_pubkeys_;
     size_t number_signatures_ = 0;
     stealth_prefix prefix_{0, 0};
@@ -56,17 +56,17 @@ private:
 // Result for call to initiate_stealth()
 struct BCW_API initiate_stealth_result
 {
-    data_chunk ephemkey;
+    ec_point ephemkey;
     payment_address address;
 };
 
 BCW_API initiate_stealth_result initiate_stealth(
     const stealth_address& address);
-BCW_API data_chunk uncover_stealth(
-    const data_chunk& ephemkey, const ec_secret& scan_privkey,
-    const data_chunk& spend_pubkey);
+BCW_API ec_point uncover_stealth(
+    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& spend_pubkey);
 BCW_API ec_secret uncover_stealth_secret(
-    const data_chunk& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephemkey, const ec_secret& scan_privkey,
     const ec_secret& spend_privkey);
 
 } // namespace libwallet

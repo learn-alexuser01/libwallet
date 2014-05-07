@@ -30,7 +30,7 @@ BCW_API uint8_t stealth_address::options() const
 {
     return options_;
 }
-BCW_API const data_chunk& stealth_address::scan_pubkey() const
+BCW_API const ec_point& stealth_address::scan_pubkey() const
 {
     return scan_pubkey_;
 }
@@ -50,7 +50,7 @@ BCW_API const stealth_prefix& stealth_address::prefix() const
 
 BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
 {
-    data_chunk raw_addr = decode_base58(encoded_address);
+    ec_point raw_addr = decode_base58(encoded_address);
     if (!verify_checksum(raw_addr))
         return false;
     BITCOIN_ASSERT(raw_addr.size() >= 4);
@@ -70,7 +70,7 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     ++iter;
     auto scan_key_begin = iter;
     iter += 33;
-    scan_pubkey_ = data_chunk(scan_key_begin, iter);
+    scan_pubkey_ = ec_point(scan_key_begin, iter);
     uint8_t number_spend_pubkeys = *iter;
     ++iter;
     estimated_data_size += number_spend_pubkeys * 33;
@@ -79,7 +79,7 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     {
         auto spend_key_begin = iter;
         iter += 33;
-        spend_pubkeys_.emplace_back(data_chunk(spend_key_begin, iter));
+        spend_pubkeys_.emplace_back(ec_point(spend_key_begin, iter));
     }
     number_signatures_ = *iter;
     ++iter;
@@ -100,14 +100,14 @@ BCW_API initiate_stealth_result initiate_stealth(
 {
 }
 
-BCW_API data_chunk uncover_stealth(
-    const data_chunk& ephemkey, const ec_secret& scan_privkey,
-    const data_chunk& spend_pubkey)
+BCW_API ec_point uncover_stealth(
+    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& spend_pubkey)
 {
 }
 
 BCW_API ec_secret uncover_stealth_secret(
-    const data_chunk& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephemkey, const ec_secret& scan_privkey,
     const ec_secret& spend_privkey)
 {
 }
