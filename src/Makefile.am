@@ -8,6 +8,7 @@ libwallet_la_SOURCES = \
     transaction.cpp \
     hd_keys.cpp \
     key_formats.cpp \
+    ec_math.cpp \
     stealth.cpp \
     uri.cpp
 

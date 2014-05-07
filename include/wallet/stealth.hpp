@@ -19,7 +19,9 @@
 #ifndef LIBWALLET_STEALTH_HPP
 #define LIBWALLET_STEALTH_HPP
 
+#include <bitcoin/address.hpp>
 #include <bitcoin/stealth.hpp>
+#include <bitcoin/utility/elliptic_curve_key.hpp>
 #include <wallet/define.hpp>
 
 namespace libwallet {
@@ -63,7 +65,7 @@ BCW_API initiate_stealth_result initiate_stealth(
 BCW_API data_chunk uncover_stealth(
     const data_chunk& ephemkey, const secret_parameter& scan_privkey,
     const data_chunk& spend_pubkey);
-BCW_API data_chunk uncover_stealth_secret(
+BCW_API secret_parameter uncover_stealth_secret(
     const data_chunk& ephemkey, const secret_parameter& scan_privkey,
     const secret_parameter& spend_privkey);
 

@@ -5,6 +5,7 @@ wallet_include_HEADERS = \
     key_formats.hpp \
     transaction.hpp \
     electrum_keys.hpp \
+    ec_math.hpp \
     hd_keys.hpp \
     mnemonic.hpp \
     stealth.hpp \
