@@ -16,19 +16,50 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+#include <wallet/define.hpp>
 #include <wallet/hd_keys.hpp>
+
+#ifdef USE_OPENSSL_EC
+#include <openssl/ec.h>
+#endif
+#ifdef USE_OPENSSL_HM
+#include <openssl/hmac.h>
+#endif
+#ifdef USE_OPENSSL_BN
+#include <openssl/bn.h>
+#endif
 
 #include <algorithm>
 #include <bitcoin/bitcoin.hpp>
-#include <wallet/ec_math.hpp>
-
-#ifdef USE_OPENSSL_HM
-    #include <openssl/hmac.h>
-#endif
 
 namespace libwallet {
 
+template<typename T, void destroy(T* p)>
+class auto_free
+{
+public:
+    auto_free(T* p)
+      : ptr(p)
+    {
+    }
+    ~auto_free()
+    {
+        destroy(ptr);
+    }
+    operator T*()
+    {
+        return ptr;
+    }
+    T* ptr;
+};
+
+typedef auto_free<BIGNUM, BN_free> ssl_bignum;
+typedef auto_free<BN_CTX, BN_CTX_free> ssl_bn_ctx;
+
 // ****************************************************************************
+typedef auto_free<EC_GROUP, EC_GROUP_free> ssl_ec_group;
+typedef auto_free<EC_POINT, EC_POINT_free> ssl_ec_point;
+
 secret_parameter secp256k1_n
 {
     {

@@ -6,9 +6,6 @@ default: all
 .cpp.o:
 	$(CXX) -o $@ -c $< $(CXXFLAGS)
 
-ec: ec.o
-	$(CXX) -o $@ $< $(LIBS)
-
 determ: determ.o
 	$(CXX) -o $@ $< $(LIBS)
 
@@ -18,8 +15,8 @@ hd: hd.o
 uri: uri.o
 	$(CXX) -o $@ $< $(LIBS)
 
-all: determ hd uri ec
+all: determ hd uri
 
 clean:
-	rm -f determ hd uri ec
+	rm -f determ hd uri
 	rm -f *.o
