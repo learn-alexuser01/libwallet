@@ -152,7 +152,7 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i) const
 
     // The returned child key Ki is point(parse256(IL)) + Kpar.
     ec_point Ki = K_;
-    if (!(Ki += I.L))
+    if (!tweak_add(Ki, I.L))
         return hd_public_key();
 
     hd_key_lineage lineage
@@ -264,7 +264,7 @@ BCW_API hd_private_key hd_private_key::generate_private_key(uint32_t i) const
 
     // The child key ki is (parse256(IL) + kpar) mod n:
     ec_secret ki = k_;
-    if (!(ki += I.L))
+    if (!ec_add(ki, I.L))
         return hd_private_key();
 
     hd_key_lineage lineage
