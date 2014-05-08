@@ -28,29 +28,21 @@ namespace libwallet {
 
 using namespace libbitcoin;
 
-class stealth_address
+struct stealth_address
 {
-public:
     typedef std::vector<ec_point> pubkey_list;
     enum
     {
         reuse_key_option = 0x01
     };
 
-    BCW_API uint8_t options() const;
-    BCW_API const ec_point& scan_pubkey() const;
-    BCW_API const pubkey_list& spend_pubkeys() const;
-    BCW_API size_t number_signatures() const;
-    BCW_API const stealth_prefix& prefix() const;
-
     BCW_API bool set_encoded(const std::string& encoded_address);
 
-private:
-    uint8_t options_ = 0;
-    ec_point scan_pubkey_;
-    pubkey_list spend_pubkeys_;
-    size_t number_signatures_ = 0;
-    stealth_prefix prefix_{0, 0};
+    uint8_t options = 0;
+    ec_point scan_pubkey;
+    pubkey_list spend_pubkeys;
+    size_t number_signatures = 0;
+    stealth_prefix prefix{0, 0};
 };
 
 BCW_API ec_point initiate_stealth(

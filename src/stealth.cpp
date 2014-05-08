@@ -27,28 +27,6 @@ namespace libwallet {
 
 constexpr uint8_t stealth_version_byte = 0x2a;
 
-BCW_API uint8_t stealth_address::options() const
-{
-    return options_;
-}
-BCW_API const ec_point& stealth_address::scan_pubkey() const
-{
-    return scan_pubkey_;
-}
-BCW_API const stealth_address::pubkey_list&
-    stealth_address::spend_pubkeys() const
-{
-    return spend_pubkeys_;
-}
-BCW_API size_t stealth_address::number_signatures() const
-{
-    return number_signatures_;
-}
-BCW_API const stealth_prefix& stealth_address::prefix() const
-{
-    return prefix_;
-}
-
 BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
 {
     ec_point raw_addr = decode_base58(encoded_address);
@@ -67,11 +45,11 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     if (version != stealth_version_byte)
         return false;
     ++iter;
-    options_ = *iter;
+    options = *iter;
     ++iter;
     auto scan_key_begin = iter;
     iter += 33;
-    scan_pubkey_ = ec_point(scan_key_begin, iter);
+    scan_pubkey = ec_point(scan_key_begin, iter);
     uint8_t number_spend_pubkeys = *iter;
     ++iter;
     estimated_data_size += number_spend_pubkeys * 33;
@@ -80,15 +58,15 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     {
         auto spend_key_begin = iter;
         iter += 33;
-        spend_pubkeys_.emplace_back(ec_point(spend_key_begin, iter));
+        spend_pubkeys.emplace_back(ec_point(spend_key_begin, iter));
     }
-    number_signatures_ = *iter;
+    number_signatures = *iter;
     ++iter;
-    prefix_.number_bits = *iter;
+    prefix.number_bits = *iter;
     ++iter;
     size_t number_bitfield_bytes = 0;
-    if (prefix_.number_bits > 0)
-        number_bitfield_bytes = prefix_.number_bits / 8 + 1;
+    if (prefix.number_bits > 0)
+        number_bitfield_bytes = prefix.number_bits / 8 + 1;
     estimated_data_size += number_bitfield_bytes;
     BITCOIN_ASSERT(raw_addr.size() >= estimated_data_size);
     // Unimplemented currently!
