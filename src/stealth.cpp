@@ -76,7 +76,7 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
 
 ec_secret shared_secret(const ec_secret& secret, ec_point point)
 {
-    bool success = point *= secret;
+    bool success = ec_mul(point, secret);
     BITCOIN_ASSERT(success);
     return sha256_hash(point);
 }
@@ -86,7 +86,7 @@ BCW_API ec_point initiate_stealth(
     const ec_point& spend_pubkey)
 {
     ec_point final = spend_pubkey;
-    bool success = final += shared_secret(ephem_secret, scan_pubkey);
+    bool success = tweak_add(final, shared_secret(ephem_secret, scan_pubkey));
     BITCOIN_ASSERT(success);
     return final;
 }
@@ -96,7 +96,7 @@ BCW_API ec_point uncover_stealth(
     const ec_point& spend_pubkey)
 {
     ec_point final = spend_pubkey;
-    bool success = final += shared_secret(scan_secret, ephem_pubkey);
+    bool success = tweak_add(final, shared_secret(scan_secret, ephem_pubkey));
     BITCOIN_ASSERT(success);
     return final;
 }
@@ -106,7 +106,7 @@ BCW_API ec_secret uncover_stealth_secret(
     const ec_secret& spend_secret)
 {
     ec_secret final = spend_secret;
-    bool success = final += shared_secret(scan_secret, ephem_pubkey);
+    bool success = ec_add(final, shared_secret(scan_secret, ephem_pubkey));
     BITCOIN_ASSERT(success);
     return final;
 }
