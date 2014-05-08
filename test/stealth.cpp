@@ -63,6 +63,12 @@ BOOST_AUTO_TEST_CASE(stealth)
         ephem_pubkey, scan_privkey, spend_privkey);
     BOOST_REQUIRE(secret_to_public_key(privkey) == pubkey_1);
 
+    // sx ec-tweak-add
+    //   03d5b3853bbee336b551ff999b0b1d656e65a7649037ae0dcb02b3c4ff5f29e5be
+    //   4b4974266ee6c8bed9eff2cd1087bbc1101f17bad9c37814f8561b67f550c544
+    //   | sx addr
+    // 1Gvq8pSTRocNLDyf858o4PL3yhZm5qQDgB
+
     bc::payment_address payaddr;
     set_public_key(payaddr, pubkey_1);
     BOOST_REQUIRE(payaddr.encoded() == "1Gvq8pSTRocNLDyf858o4PL3yhZm5qQDgB");
