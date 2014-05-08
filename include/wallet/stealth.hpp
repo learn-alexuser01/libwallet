@@ -53,20 +53,14 @@ private:
     stealth_prefix prefix_{0, 0};
 };
 
-// Result for call to initiate_stealth()
-struct BCW_API initiate_stealth_result
-{
-    ec_point ephemkey;
-    payment_address address;
-};
-
-BCW_API initiate_stealth_result initiate_stealth(
-    const stealth_address& address);
+BCW_API ec_point initiate_stealth(
+    const ec_secret& ephem_privkey, const ec_point& scan_pubkey,
+    const ec_point& spend_pubkey);
 BCW_API ec_point uncover_stealth(
-    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
     const ec_point& spend_pubkey);
 BCW_API ec_secret uncover_stealth_secret(
-    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
     const ec_secret& spend_privkey);
 
 } // namespace libwallet

@@ -21,6 +21,7 @@
 #include <bitcoin/utility/assert.hpp>
 #include <bitcoin/utility/base58.hpp>
 #include <bitcoin/utility/checksum.hpp>
+#include <bitcoin/utility/hash.hpp>
 
 namespace libwallet {
 
@@ -95,21 +96,41 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     return true;
 }
 
-BCW_API initiate_stealth_result initiate_stealth(
-    const stealth_address& address)
+ec_secret shared_secret(const ec_secret& secret, ec_point point)
 {
+    bool success = point *= secret;
+    BITCOIN_ASSERT(success);
+    return sha256_hash(point);
+}
+
+BCW_API ec_point initiate_stealth(
+    const ec_secret& ephem_privkey, const ec_point& scan_pubkey,
+    const ec_point& spend_pubkey)
+{
+    ec_point final = spend_pubkey;
+    bool success = final += shared_secret(ephem_privkey, scan_pubkey);
+    BITCOIN_ASSERT(success);
+    return final;
 }
 
 BCW_API ec_point uncover_stealth(
-    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
     const ec_point& spend_pubkey)
 {
+    ec_point final = spend_pubkey;
+    bool success = final += shared_secret(scan_privkey, ephem_pubkey);
+    BITCOIN_ASSERT(success);
+    return final;
 }
 
 BCW_API ec_secret uncover_stealth_secret(
-    const ec_point& ephemkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
     const ec_secret& spend_privkey)
 {
+    ec_secret final = spend_privkey;
+    bool success = final += shared_secret(scan_privkey, ephem_pubkey);
+    BITCOIN_ASSERT(success);
+    return final;
 }
 
 } // namespace libwallet
