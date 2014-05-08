@@ -104,31 +104,31 @@ ec_secret shared_secret(const ec_secret& secret, ec_point point)
 }
 
 BCW_API ec_point initiate_stealth(
-    const ec_secret& ephem_privkey, const ec_point& scan_pubkey,
+    const ec_secret& ephem_secret, const ec_point& scan_pubkey,
     const ec_point& spend_pubkey)
 {
     ec_point final = spend_pubkey;
-    bool success = final += shared_secret(ephem_privkey, scan_pubkey);
+    bool success = final += shared_secret(ephem_secret, scan_pubkey);
     BITCOIN_ASSERT(success);
     return final;
 }
 
 BCW_API ec_point uncover_stealth(
-    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_secret,
     const ec_point& spend_pubkey)
 {
     ec_point final = spend_pubkey;
-    bool success = final += shared_secret(scan_privkey, ephem_pubkey);
+    bool success = final += shared_secret(scan_secret, ephem_pubkey);
     BITCOIN_ASSERT(success);
     return final;
 }
 
 BCW_API ec_secret uncover_stealth_secret(
-    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
-    const ec_secret& spend_privkey)
+    const ec_point& ephem_pubkey, const ec_secret& scan_secret,
+    const ec_secret& spend_secret)
 {
-    ec_secret final = spend_privkey;
-    bool success = final += shared_secret(scan_privkey, ephem_pubkey);
+    ec_secret final = spend_secret;
+    bool success = final += shared_secret(scan_secret, ephem_pubkey);
     BITCOIN_ASSERT(success);
     return final;
 }

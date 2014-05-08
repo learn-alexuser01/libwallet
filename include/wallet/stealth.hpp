@@ -54,14 +54,14 @@ private:
 };
 
 BCW_API ec_point initiate_stealth(
-    const ec_secret& ephem_privkey, const ec_point& scan_pubkey,
+    const ec_secret& ephem_secret, const ec_point& scan_pubkey,
     const ec_point& spend_pubkey);
 BCW_API ec_point uncover_stealth(
-    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
+    const ec_point& ephem_pubkey, const ec_secret& scan_secret,
     const ec_point& spend_pubkey);
 BCW_API ec_secret uncover_stealth_secret(
-    const ec_point& ephem_pubkey, const ec_secret& scan_privkey,
-    const ec_secret& spend_privkey);
+    const ec_point& ephem_pubkey, const ec_secret& scan_secret,
+    const ec_secret& spend_secret);
 
 } // namespace libwallet
 
