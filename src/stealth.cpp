@@ -22,6 +22,7 @@
 #include <bitcoin/utility/base58.hpp>
 #include <bitcoin/utility/checksum.hpp>
 #include <bitcoin/utility/hash.hpp>
+#include <bitcoin/format.hpp>
 
 namespace libwallet {
 
@@ -29,7 +30,7 @@ constexpr uint8_t stealth_version_byte = 0x2a;
 
 BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
 {
-    ec_point raw_addr = decode_base58(encoded_address);
+    data_chunk raw_addr = decode_base58(encoded_address);
     if (!verify_checksum(raw_addr))
         return false;
     BITCOIN_ASSERT(raw_addr.size() >= 4);
@@ -72,6 +73,23 @@ BCW_API bool stealth_address::set_encoded(const std::string& encoded_address)
     // Unimplemented currently!
     BITCOIN_ASSERT(number_bitfield_bytes == 0);
     return true;
+}
+
+BCW_API std::string stealth_address::encoded() const
+{
+    data_chunk raw_addr;
+    raw_addr.push_back(stealth_version_byte);
+    raw_addr.push_back(options);
+    extend_data(raw_addr, scan_pubkey);
+    uint8_t number_spend_pubkeys = static_cast<uint8_t>(spend_pubkeys.size());
+    raw_addr.push_back(number_spend_pubkeys);
+    for (const ec_point& pubkey: spend_pubkeys)
+        extend_data(raw_addr, pubkey);
+    raw_addr.push_back(number_signatures);
+    BITCOIN_ASSERT_MSG(prefix.number_bits == 0, "Not yet implemented!");
+    raw_addr.push_back(0);
+    append_checksum(raw_addr);
+    return encode_base58(raw_addr);
 }
 
 ec_secret shared_secret(const ec_secret& secret, ec_point point)

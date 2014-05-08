@@ -37,6 +37,7 @@ struct stealth_address
     };
 
     BCW_API bool set_encoded(const std::string& encoded_address);
+    BCW_API std::string encoded() const;
 
     uint8_t options = 0;
     ec_point scan_pubkey;

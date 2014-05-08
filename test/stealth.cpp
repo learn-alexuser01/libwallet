@@ -74,3 +74,13 @@ BOOST_AUTO_TEST_CASE(stealth)
     BOOST_REQUIRE(payaddr.encoded() == "1Gvq8pSTRocNLDyf858o4PL3yhZm5qQDgB");
 }
 
+BOOST_AUTO_TEST_CASE(stealth_addr_encoding)
+{
+    const std::string addr_str =
+        "vJmzLu29obZcUGXXgotapfQLUpz7dfnZpbr4xg1R75qctf8xaXAteRdi3ZUk3T2Z"
+        "MSad5KyPbve7uyH6eswYAxLHRVSbWgNUeoGuXp";
+    libwallet::stealth_address addr;
+    addr.set_encoded(addr_str);
+    BOOST_REQUIRE(addr.encoded() == addr_str);
+}
+
