@@ -152,7 +152,7 @@ BCW_API hd_public_key hd_public_key::generate_public_key(uint32_t i) const
 
     // The returned child key Ki is point(parse256(IL)) + Kpar.
     ec_point Ki = K_;
-    if (!tweak_add(Ki, I.L))
+    if (!ec_tweak_add(Ki, I.L))
         return hd_public_key();
 
     hd_key_lineage lineage
