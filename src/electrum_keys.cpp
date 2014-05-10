@@ -98,10 +98,13 @@ const data_chunk bignum_data(BIGNUM* bn)
 
 BCW_API void deterministic_wallet::new_seed()
 {
-    constexpr size_t bits_needed = 8 * seed_size / 2;
-    ssl_bignum rand_value;
-    BN_rand(rand_value, bits_needed, 0, 0);
-    bool set_success = set_seed(bignum_hex(rand_value));
+    std::random_device random;
+    std::default_random_engine engine(random());
+    data_chunk seed(seed_size / 2);
+    for (uint8_t& byte: seed)
+        byte = engine() % std::numeric_limits<uint8_t>::max();
+    BITCOIN_ASSERT(encode_hex(seed).size() == seed_size);
+    bool set_success = set_seed(encode_hex(seed));
     BITCOIN_ASSERT(set_success);
 }
 
@@ -129,11 +132,7 @@ secret_parameter stretch_seed(const std::string& seed)
 
 data_chunk pubkey_from_secret(const secret_parameter& secret)
 {
-    // Disable compression for this key (legacy electrum)
-    elliptic_curve_key privkey;
-    privkey.set_compressed(false);
-    return privkey.set_secret(secret) ? privkey.public_key() :
-        data_chunk();
+    return secret_to_public_key(secret);
 }
 
 BCW_API bool deterministic_wallet::set_seed(std::string seed)
