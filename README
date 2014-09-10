@@ -2,5 +2,5 @@ libwallet is a client side library for wallet functionality such as
 working with addresses, deterministic wallets and different key formats.
 libwallet was originally created after forking the non-critical code
 from libbitcoin into a separate library. As server-only dependencies
-are being removed from libbitcoin this will soon be merged back into
-libbitcoin.
+are being removed from libbitcoin has been merged back into
+libbitcoin in the current libbitcoin 'develop' branch.
