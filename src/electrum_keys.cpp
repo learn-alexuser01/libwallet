@@ -19,6 +19,10 @@
 #include <wallet/define.hpp>
 #include <wallet/electrum_keys.hpp>
 
+#ifdef _MSC_VER
+#include <random>
+#endif
+
 #ifdef USE_OPENSSL_EC
 #include <openssl/ec.h>
 #endif

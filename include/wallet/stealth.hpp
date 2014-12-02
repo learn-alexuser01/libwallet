@@ -43,7 +43,7 @@ struct stealth_address
     ec_point scan_pubkey;
     pubkey_list spend_pubkeys;
     size_t number_signatures = 0;
-    stealth_prefix prefix{0, 0};
+    stealth_prefix prefix;
 };
 
 BCW_API ec_point initiate_stealth(
